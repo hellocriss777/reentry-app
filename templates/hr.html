@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>reentry — HR Dashboard</title>
+<link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">re<span>entry</span></div>
+    <div class="sidebar-view-label">HR Dashboard</div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-item active" onclick="goTo('overview',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Overview
+      </button>
+      <button class="sidebar-item" onclick="goTo('add',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>Add Returner
+      </button>
+      <button class="sidebar-item" onclick="goTo('digest',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Change Digest
+      </button>
+      <button class="sidebar-item" onclick="goTo('tracker',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>Confidence Tracker
+      </button>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page">
+
+      <!-- OVERVIEW -->
+      <div class="section active" id="sec-overview">
+        <div class="dark-header">
+          <div class="eyebrow">HR DASHBOARD — REENTRY</div>
+          <h1>Overview</h1>
+          <div class="sub">All returning employees</div>
+        </div>
+
+        <div class="stats-grid stagger">
+          <div class="stat-card dark">
+            <div class="stat-label">Returners</div>
+            <div class="stat-val" id="stat-total">0</div>
+            <div class="stat-sub">active</div>
+          </div>
+          <div class="stat-card pink">
+            <div class="stat-label">Need attention</div>
+            <div class="stat-val" id="stat-attention">0</div>
+            <div class="stat-sub">low confidence</div>
+          </div>
+        </div>
+
+        <div class="section-label">ATTENTION NEEDED</div>
+        <div id="attention-list"></div>
+
+        <div class="section-label">ALL RETURNERS</div>
+        <div id="returner-list" class="stagger"></div>
+
+        <div class="section-label">MANAGER GUIDANCE <span style="font-weight:400;color:var(--text-3);font-size:10px;letter-spacing:0;">send action items to manager</span></div>
+        <div class="card">
+          <label class="form-label">Select employee</label>
+          <select class="form-input" id="maction-emp" style="margin-bottom:10px;"></select>
+          <label class="form-label">Action item for the manager this week</label>
+          <input class="form-input" id="maction-text" placeholder="e.g. Invite Sarah to the planning meeting this week" type="text"/>
+          <button class="btn btn-dark btn-full mt-16" onclick="saveMAction()">Send to manager →</button>
+        </div>
+        <div id="maction-list" class="stagger"></div>
+
+        <div class="section-label">CONFIDENCE TREND</div>
+        <div class="card">
+          <div class="text-sm text-muted" style="margin-bottom:12px;">Average check-in score over time</div>
+          <div class="chart-wrap" style="height:140px;"><canvas id="trend-chart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ADD -->
+      <div class="section" id="sec-add">
+        <div class="dark-header">
+          <div class="eyebrow">HR DASHBOARD</div>
+          <h1>Add a returner</h1>
+          <div class="sub">Set up a new return plan</div>
+        </div>
+        <div class="card mt-16">
+          <div class="form-group" style="margin-top:0;"><label class="form-label">Full name</label><input class="form-input" id="add-name" placeholder="e.g. Sarah Chen" type="text"/></div>
+          <div class="form-group"><label class="form-label">Role / job title</label><input class="form-input" id="add-role" placeholder="e.g. Senior Designer" type="text"/></div>
+          <div class="form-group"><label class="form-label">Return date</label><input class="form-input" id="add-date" type="date"/></div>
+          <div class="form-group"><label class="form-label">Assign manager</label><input class="form-input" id="add-manager" placeholder="e.g. Tom Walters" type="text"/></div>
+          <div class="form-group"><label class="form-label">Assign buddy</label><input class="form-input" id="add-buddy" placeholder="e.g. Lisa Morgan" type="text"/></div>
+          <button class="btn btn-pink btn-full mt-16" onclick="saveEmployee()">Create return plan →</button>
+        </div>
+        <div class="card mt-12" style="background:var(--pink-soft);border-color:rgba(212,83,126,0.2);">
+          <div style="font-size:12px;font-weight:600;color:var(--pink);margin-bottom:4px;">Reset demo data</div>
+          <div class="text-sm text-muted" style="margin-bottom:10px;">Clear all data and restore defaults for demo purposes.</div>
+          <button class="btn btn-ghost btn-sm" onclick="resetAll()">Clear all data →</button>
+        </div>
+      </div>
+
+      <!-- DIGEST -->
+      <div class="section" id="sec-digest">
+        <div class="dark-header">
+          <div class="eyebrow">CHANGE DIGEST</div>
+          <h1>What changed</h1>
+          <div class="sub">Updates visible to the returning employee</div>
+        </div>
+        <div class="card mt-16">
+          <div class="form-group" style="margin-top:0;"><label class="form-label">Category</label><select class="form-input" id="dig-cat"><option>Process</option><option>Tools</option><option>Team</option><option>Policy</option><option>Other</option></select></div>
+          <div class="form-group"><label class="form-label">Title</label><input class="form-input" id="dig-title" placeholder="e.g. Standup moved to 9am" type="text"/></div>
+          <div class="form-group"><label class="form-label">Details</label><textarea class="form-input" id="dig-body" rows="3" placeholder="What should the employee know about this change?"></textarea></div>
+          <button class="btn btn-pink btn-full mt-16" onclick="saveDigest()">Publish update →</button>
+        </div>
+        <div class="section-label">PUBLISHED UPDATES</div>
+        <div id="digest-list" class="stagger"></div>
+      </div>
+
+      <!-- TRACKER -->
+      <div class="section" id="sec-tracker">
+        <div class="dark-header">
+          <div class="eyebrow">CONFIDENCE TRACKER</div>
+          <h1>Check-in scores</h1>
+          <div class="sub">5-dimension wellbeing data</div>
+        </div>
+
+        <div class="card mt-16" style="margin-bottom:12px;">
+          <label class="form-label">Select employee</label>
+          <select class="form-input" id="tracker-emp-select" onchange="render()"></select>
+        </div>
+
+        <div class="card">
+          <div class="text-sm text-muted" style="margin-bottom:12px;">Score per check-in session</div>
+          <div class="chart-wrap" style="height:160px;"><canvas id="tracker-chart"></canvas></div>
+        </div>
+        <div class="section-label">DIMENSION BREAKDOWN</div>
+        <div id="dimension-breakdown" class="stagger"></div>
+        <div class="section-label">RECENT CHECK-INS</div>
+        <div id="checkin-detail" class="stagger"></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<a href="/" class="home-fab" title="Demo Portal">⌂</a>
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="goTo('overview',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Overview</button>
+  <button class="nav-btn" onclick="goTo('add',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>Add</button>
+  <button class="nav-btn" onclick="goTo('digest',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Digest</button>
+  <button class="nav-btn" onclick="goTo('tracker',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>Tracker</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script src="/static/data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+let trendC = null, trackC = null;
+
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function initials(n){ return (n||'?').split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2); }
+
+function goTo(id, btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item,.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelectorAll('.sidebar-item,.nav-btn').forEach(b=>{
+    if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+  });
+  render();
+}
+
+async function resetAll(){
+  if(!confirm('Clear all data and reset to defaults?')) return;
+  await fetch('/api/reset', { method: 'POST' });
+  await DB.initHR();
+  render();
+  showToast('Data reset!');
+}
+
+async function saveEmployee(){
+  const name    = document.getElementById('add-name').value.trim();
+  const role    = document.getElementById('add-role').value.trim();
+  const date    = document.getElementById('add-date').value;
+  const manager = document.getElementById('add-manager').value.trim();
+  const buddy   = document.getElementById('add-buddy').value.trim();
+  if(!name||!role||!date){ showToast('Please fill in name, role and date'); return; }
+  await DB.createEmployee({ name, role, startDate: date, manager, buddy, buddyEmail:'', managerEmail:'' });
+  ['add-name','add-role','add-manager','add-buddy'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('add-date').value='';
+  showToast(name+"'s return plan created!");
+  render();
+}
+
+async function saveMAction(){
+  const text  = document.getElementById('maction-text').value.trim();
+  const empId = parseInt(document.getElementById('maction-emp').value);
+  if(!text){ showToast('Please enter an action item'); return; }
+  const date = DB.getDemoDate().toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+  await DB.addManagerAction(empId, text, date);
+  document.getElementById('maction-text').value='';
+  showToast('Action sent to manager!');
+  render();
+}
+
+async function saveDigest(){
+  const cat   = document.getElementById('dig-cat').value;
+  const title = document.getElementById('dig-title').value.trim();
+  const body  = document.getElementById('dig-body').value.trim();
+  if(!title||!body){ showToast('Please fill in title and details'); return; }
+  const d = DB.getDemoDate();
+  const iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  await DB.addChange(cat, title, body, iso);
+  document.getElementById('dig-title').value='';
+  document.getElementById('dig-body').value='';
+  showToast('Update published!');
+  render();
+}
+
+function makeChart(id, labels, datasets, destroy){
+  const canvas = document.getElementById(id);
+  if(!canvas) return null;
+  if(destroy) destroy.destroy();
+  return new Chart(canvas,{type:'line',data:{labels,datasets},options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:datasets.length>1,position:'bottom',labels:{font:{size:11},boxWidth:12,color:'#888'}}},
+    scales:{y:{min:0,max:5,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},color:'#888'}},
+            x:{grid:{display:false},ticks:{font:{size:10},color:'#888',maxRotation:0}}}
+  }});
+}
+
+function getAvgCheckin(checkins){
+  if(!checkins||!checkins.length) return null;
+  const last = checkins[checkins.length-1];
+  const dims = [last.belonging,last.confidence,last.inclusion,last.support,last.visibility];
+  return (dims.reduce((a,b)=>a+b,0)/dims.length).toFixed(1);
+}
+
+function render(){
+  const employees   = DB._store.employees || [];
+  const changes     = DB._store.whatChanged || [];
+  const allCheckins = DB._store._allCheckins || [];
+  const allActions  = DB._store._allActions || [];
+
+  // Refresh employee selects
+  const empOptions = employees.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
+  document.getElementById('maction-emp').innerHTML = empOptions || '<option value="">No employees</option>';
+  const trkSel = document.getElementById('tracker-emp-select');
+  if(trkSel) trkSel.innerHTML = empOptions || '<option value="">No employees</option>';
+
+  // Stats
+  let attnCount = 0;
+  allCheckins.forEach(ci => { const avg = getAvgCheckin(ci); if(avg && parseFloat(avg) < 3) attnCount++; });
+  document.getElementById('stat-total').textContent = employees.length;
+  document.getElementById('stat-attention').textContent = attnCount;
+
+  // Attention list
+  const atl = document.getElementById('attention-list');
+  if(atl){
+    const attentionItems = employees.filter((_,i) => {
+      const avg = getAvgCheckin(allCheckins[i]);
+      return avg && parseFloat(avg) < 3;
+    });
+    atl.innerHTML = !attentionItems.length
+      ? '<div class="empty">All returners on track ✓</div>'
+      : attentionItems.map((e,i) => {
+          const avg = getAvgCheckin(allCheckins[employees.indexOf(e)]);
+          return `<div class="accent-item"><div class="accent-item-label">Low Confidence</div><div class="accent-item-body">${e.name}'s average score is ${avg}/5. Consider scheduling a 1:1 with their manager this week.</div></div>`;
+        }).join('');
+  }
+
+  // Returner list
+  const rl = document.getElementById('returner-list');
+  if(rl){
+    if(!employees.length){
+      rl.innerHTML = '<div class="empty">No returners yet. Add one using the form →</div>';
+    } else {
+      rl.innerHTML = employees.map((e,i) => {
+        const ci = allCheckins[i] || [];
+        const avg = getAvgCheckin(ci);
+        const pct = avg ? Math.round((parseFloat(avg)/5)*100) : 0;
+        const needAttn = avg && parseFloat(avg) < 3;
+        const [y,m,d] = (e.start_date||'2026-01-01').split('-').map(Number);
+        const days = Math.max(0, Math.floor((DB.getDemoDate() - new Date(y,m-1,d,12,0,0)) / 86400000));
+        return `<div class="person-row">
+          <div class="avatar avatar-md avatar-dark">${initials(e.name)}</div>
+          <div style="flex:1;">
+            <div class="person-name">${e.name}</div>
+            <div class="person-sub">Day ${days} · ${e.role} · <a href="/employee?id=${e.id}" style="color:var(--pink);text-decoration:none;">open view →</a></div>
+            <div class="mini-bar-bg"><div class="mini-bar" style="width:${pct}%"></div></div>
+          </div>
+          <div class="dot ${needAttn?'dot-pink':'dot-green'}"></div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // Manager action list (show all across employees)
+  const mal = document.getElementById('maction-list');
+  if(mal){
+    const allActs = allActions.flat();
+    mal.innerHTML = !allActs.length
+      ? '<div class="empty">No guidance sent to managers yet.</div>'
+      : allActs.slice(0,8).map(a => {
+          const emp = employees.find(e=>e.id===a.employee_id);
+          return `<div class="list-item" style="display:flex;align-items:center;gap:12px;">
+            <div class="check-box ${a.done?'done':''}"></div>
+            <div style="flex:1;">
+              <div class="list-item-title" style="${a.done?'text-decoration:line-through;color:var(--text-3);':''}">${a.text}</div>
+              <div class="list-item-date">${a.date}${emp?' · '+emp.name:''} · ${a.done?'✓ Completed':'Pending'}</div>
+            </div>
+            <div class="dot ${a.done?'dot-green':'dot-grey'}"></div>
+          </div>`;
+        }).join('');
+  }
+
+  // Digest
+  const dl = document.getElementById('digest-list');
+  if(dl){
+    dl.innerHTML = !changes.length
+      ? '<div class="empty">No updates published yet.</div>'
+      : changes.map(c =>
+          `<div class="list-item">
+            <div class="list-item-cat">${c.category}</div>
+            <div class="list-item-title">${c.title}</div>
+            <div class="list-item-body">${c.body}</div>
+          </div>`).join('');
+  }
+
+  // Tracker: use selected employee
+  const trkSelEl = document.getElementById('tracker-emp-select');
+  const trkIdx = trkSelEl ? employees.findIndex(e=>e.id===parseInt(trkSelEl.value)) : 0;
+  const ci = allCheckins[trkIdx >= 0 ? trkIdx : 0] || [];
+
+  const db2 = document.getElementById('dimension-breakdown');
+  if(db2){
+    if(!ci.length){ db2.innerHTML='<div class="empty">No check-ins yet</div>'; }
+    else{
+      const last = ci[ci.length-1];
+      db2.innerHTML = ['Belonging','Confidence','Inclusion','Support','Visibility'].map(d=>{
+        const k=d.toLowerCase(); const pct=Math.round((last[k]/5)*100);
+        return `<div class="card mt-8"><div class="flex-between" style="margin-bottom:8px;"><div style="font-size:14px;font-weight:500;">${d}</div><div style="font-size:14px;font-weight:700;" class="text-pink">${last[k]}/5</div></div><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div></div>`;
+      }).join('');
+    }
+  }
+
+  const cd = document.getElementById('checkin-detail');
+  if(cd){
+    cd.innerHTML = !ci.length
+      ? '<div class="empty">No check-ins yet</div>'
+      : ci.slice(-5).reverse().map(c=>{
+          const dims=[c.belonging,c.confidence,c.inclusion,c.support,c.visibility];
+          const a=(dims.reduce((x,y)=>x+y,0)/5).toFixed(1);
+          return `<div class="card mt-8"><div class="flex-between"><div class="text-sm text-muted">${c.date}</div><div style="font-size:20px;font-weight:700;" class="text-pink">${a}<span class="text-muted" style="font-size:12px;font-weight:400;">/5</span></div></div>${c.note?`<div class="text-sm text-muted mt-8" style="font-style:italic;">"${c.note}"</div>`:''}</div>`;
+        }).join('');
+  }
+
+  // Trend chart (first employee)
+  const firstCi = allCheckins[0] || [];
+  const labels   = firstCi.length ? firstCi.map(c=>c.date) : ['No data'];
+  const avgData  = firstCi.length ? firstCi.map(c=>{ const d=[c.belonging,c.confidence,c.inclusion,c.support,c.visibility]; return parseFloat((d.reduce((a,b)=>a+b,0)/5).toFixed(2)); }) : [0];
+  trendC = makeChart('trend-chart', labels, [{data:avgData,borderColor:'#D4537E',backgroundColor:'rgba(212,83,126,0.08)',fill:true,tension:0.4,pointBackgroundColor:'#D4537E',pointRadius:4,borderWidth:2}], trendC);
+
+  // Tracker chart
+  trackC = makeChart('tracker-chart', ci.length?ci.map(c=>c.date):['No data'], ci.length?[
+    {label:'Belonging',data:ci.map(c=>c.belonging),borderColor:'#D4537E',tension:0.4,pointRadius:3,borderWidth:2,fill:false},
+    {label:'Confidence',data:ci.map(c=>c.confidence),borderColor:'#2C2B29',tension:0.4,pointRadius:3,borderWidth:2,fill:false},
+    {label:'Inclusion',data:ci.map(c=>c.inclusion),borderColor:'#A8A7A3',tension:0.4,pointRadius:3,borderWidth:2,fill:false},
+  ]:[{label:'No data',data:[0],borderColor:'#ddd',borderWidth:1,fill:false}], trackC);
+}
+
+DB.initHR().then(() => render());
+</script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>reentry — Employee</title>
+<link rel="stylesheet" href="/static/style.css"/>
+<style>
+/* Diary styles */
+.mood-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.mood-btn {
+  padding:6px 14px; border-radius:20px; border:1.5px solid var(--border-strong);
+  background:transparent; color:var(--text-2); font-size:12px; font-family:'Outfit',sans-serif;
+  cursor:pointer; transition:all .15s;
+}
+.mood-btn:hover, .mood-btn.active { border-color:var(--pink); background:var(--pink-soft); color:var(--pink); }
+.diary-entry { background:var(--card-raised); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; margin-bottom:10px; box-shadow:var(--shadow); }
+.diary-entry-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.diary-date { font-size:11px; color:var(--text-3); font-weight:600; letter-spacing:.04em; }
+.diary-mood { font-size:11px; color:var(--pink); font-weight:600; background:var(--pink-soft); padding:2px 8px; border-radius:10px; }
+.diary-text { font-size:13px; color:var(--text-2); line-height:1.6; white-space:pre-wrap; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">re<span>entry</span></div>
+    <div class="sidebar-view-label">Employee View</div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-item active" onclick="goTo('home',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Dashboard
+      </button>
+      <button class="sidebar-item" onclick="goTo('checklist',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>My Checklist
+      </button>
+      <button class="sidebar-item" onclick="goTo('checkin',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>Weekly Check-in
+      </button>
+      <button class="sidebar-item" onclick="goTo('diary',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>My Diary
+      </button>
+      <button class="sidebar-item" onclick="goTo('resources',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Resources &amp; Buddy
+      </button>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page">
+
+      <!-- HOME -->
+      <div class="section active" id="sec-home">
+        <div class="dark-header">
+          <div class="eyebrow">REENTRY — EMPLOYEE</div>
+          <h1 id="h-name">Welcome back</h1>
+          <div class="sub" id="h-role"></div>
+          <div class="day-pill"><div class="day-pill-dot"></div><span id="h-day">Day 0 of your return</span></div>
+        </div>
+
+        <div class="card-dark mt-16">
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:.1em;margin-bottom:8px;">CONFIDENCE SCORE</div>
+          <div class="flex-between">
+            <div class="conf-number" id="conf-num">—</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.3);">from check-ins</div>
+          </div>
+          <div style="margin-top:14px;" class="bar-dark">
+            <div class="bar-bg"><div class="bar-fill" id="conf-bar" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <div class="stats-grid stagger">
+          <div class="stat-card">
+            <div class="stat-label">Tasks done</div>
+            <div class="stat-val" id="tasks-done">0</div>
+            <div class="stat-sub" id="tasks-total">of 7</div>
+          </div>
+          <div class="stat-card pink">
+            <div class="stat-label">My buddy</div>
+            <div class="stat-val" style="font-size:16px;line-height:1.2;" id="buddy-stat">—</div>
+            <div class="stat-sub">tap to contact</div>
+          </div>
+        </div>
+
+        <div id="manager-notif"></div>
+        <div class="section-label">THIS WEEK</div>
+        <div id="home-checklist" class="stagger"></div>
+        <div class="section-label">WHAT CHANGED WHILE YOU WERE AWAY</div>
+        <div id="home-changes" class="stagger"></div>
+      </div>
+
+      <!-- CHECKLIST -->
+      <div class="section" id="sec-checklist">
+        <div class="dark-header">
+          <div class="eyebrow">MY CHECKLIST</div>
+          <h1>Your milestones</h1>
+          <div class="sub">Tap to mark complete</div>
+        </div>
+        <div id="full-checklist" class="stagger mt-16"></div>
+      </div>
+
+      <!-- CHECK-IN -->
+      <div class="section" id="sec-checkin">
+        <div class="dark-header">
+          <div class="eyebrow">WEEKLY CHECK-IN</div>
+          <h1>How are you feeling?</h1>
+          <div class="sub">Shared with your HR team · takes 2 mins</div>
+        </div>
+        <div class="card mt-16">
+          <div id="checkin-form">
+            <div class="slider-row"><div class="slider-label">Sense of belonging<span class="val" id="v-belonging">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('belonging',this.value)"/></div>
+            <div class="slider-row"><div class="slider-label">Confidence at work<span class="val" id="v-confidence">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('confidence',this.value)"/></div>
+            <div class="slider-row"><div class="slider-label">Feeling included<span class="val" id="v-inclusion">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('inclusion',this.value)"/></div>
+            <div class="slider-row"><div class="slider-label">Support received<span class="val" id="v-support">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('support',this.value)"/></div>
+            <div class="slider-row"><div class="slider-label">Professional visibility<span class="val" id="v-visibility">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('visibility',this.value)"/></div>
+            <div class="form-group">
+              <label class="form-label">Anything else to share?</label>
+              <textarea class="form-input" id="checkin-note" rows="3" placeholder="Optional — only you and HR can see this"></textarea>
+            </div>
+            <button class="btn btn-pink btn-full mt-16" onclick="submitCheckin()">Save check-in →</button>
+          </div>
+          <div id="checkin-done" style="display:none;text-align:center;padding:32px 0;">
+            <div style="font-size:44px;margin-bottom:12px;">✓</div>
+            <div style="font-size:16px;font-weight:600;">Check-in saved!</div>
+            <div class="text-muted text-sm" style="margin-top:6px;">Your HR team has been notified.</div>
+          </div>
+        </div>
+        <div class="section-label">PREVIOUS CHECK-INS</div>
+        <div id="checkin-history" class="stagger"></div>
+      </div>
+
+      <!-- DIARY -->
+      <div class="section" id="sec-diary">
+        <div class="dark-header">
+          <div class="eyebrow">MY DIARY</div>
+          <h1>Your private journal</h1>
+          <div class="sub">Only you can see this · write freely</div>
+        </div>
+        <div class="card mt-16">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;">How are you feeling today?</div>
+          <div class="mood-row" id="mood-row">
+            <button class="mood-btn" onclick="selectMood(this,'Confident')">😊 Confident</button>
+            <button class="mood-btn" onclick="selectMood(this,'Hopeful')">🌱 Hopeful</button>
+            <button class="mood-btn" onclick="selectMood(this,'Uncertain')">🤔 Uncertain</button>
+            <button class="mood-btn" onclick="selectMood(this,'Anxious')">😟 Anxious</button>
+            <button class="mood-btn" onclick="selectMood(this,'Frustrated')">😤 Frustrated</button>
+          </div>
+          <div class="form-group" style="margin-top:0;">
+            <label class="form-label">Write about your day</label>
+            <textarea class="form-input" id="diary-text" rows="5" placeholder="What happened today? How did it make you feel? What are you proud of? What was hard?"></textarea>
+          </div>
+          <button class="btn btn-pink btn-full mt-16" onclick="saveDiary()">Save entry →</button>
+        </div>
+        <div class="section-label">PAST ENTRIES</div>
+        <div id="diary-list" class="stagger"></div>
+      </div>
+
+      <!-- RESOURCES -->
+      <div class="section" id="sec-resources">
+        <div class="dark-header">
+          <div class="eyebrow">RESOURCES & BUDDY</div>
+          <h1>Your support network</h1>
+          <div class="sub">Curated by HR for your return</div>
+        </div>
+        <div class="section-label" style="margin-top:20px;">MY BUDDY</div>
+        <div class="person-row">
+          <div class="avatar avatar-lg avatar-pink" id="buddy-avatar">?</div>
+          <div style="flex:1;"><div class="person-name" id="buddy-name">—</div><div class="person-sub">Your assigned buddy</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Opening email...')">✉ Email</button>
+        </div>
+        <div class="section-label">MY MANAGER</div>
+        <div class="person-row">
+          <div class="avatar avatar-lg avatar-dark" id="manager-avatar">?</div>
+          <div style="flex:1;"><div class="person-name" id="manager-name">—</div><div class="person-sub">Your manager</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Opening email...')">✉ Email</button>
+        </div>
+        <div class="section-label">FROM YOUR MANAGER</div>
+        <div id="manager-msgs" class="stagger"></div>
+        <div class="section-label">RESOURCE HUB</div>
+        <div id="resource-list" class="stagger"></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<a href="/" class="home-fab" title="Demo Portal">⌂</a>
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="goTo('home',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
+  <button class="nav-btn" onclick="goTo('checklist',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Checklist</button>
+  <button class="nav-btn" onclick="goTo('checkin',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>Check-in</button>
+  <button class="nav-btn" onclick="goTo('diary',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>Diary</button>
+  <button class="nav-btn" onclick="goTo('resources',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Resources</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script src="/static/data.js"></script>
+<script>
+const empId = parseInt(new URLSearchParams(window.location.search).get('id') || '1');
+const sv = {belonging:3, confidence:3, inclusion:3, support:3, visibility:3};
+let selectedMood = '';
+
+function initials(n){ return (n||'?').split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+
+function goTo(id, btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item,.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelectorAll('.sidebar-item,.nav-btn').forEach(b=>{
+    if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+  });
+  render();
+}
+
+function updateSlider(dim, val){ sv[dim]=parseInt(val); document.getElementById('v-'+dim).textContent=val; }
+
+function selectMood(btn, mood){
+  selectedMood = mood;
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+async function toggleItem(id){
+  const cl = DB.get('checklist');
+  const item = cl.find(c=>c.id===id);
+  if(item){
+    await DB.toggleChecklist(id, !item.done);
+    render();
+  }
+}
+
+async function submitCheckin(){
+  const today = DB.getDemoDate().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+  await DB.submitCheckin({date:today, ...sv, note:document.getElementById('checkin-note').value});
+  document.getElementById('checkin-form').style.display='none';
+  document.getElementById('checkin-done').style.display='block';
+  showToast('Check-in saved!');
+  render();
+  setTimeout(()=>{
+    document.getElementById('checkin-form').style.display='block';
+    document.getElementById('checkin-done').style.display='none';
+    document.getElementById('checkin-note').value='';
+  },3000);
+}
+
+async function saveDiary(){
+  const text = document.getElementById('diary-text').value.trim();
+  if(!text){ showToast('Write something first'); return; }
+  const today = DB.getDemoDate().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+  await DB.addDiaryEntry(text, today, selectedMood);
+  document.getElementById('diary-text').value='';
+  selectedMood='';
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));
+  showToast('Entry saved!');
+  render();
+}
+
+function render(){
+  const emp=DB.get('employee')||{}, cl=DB.get('checklist')||[], ch=DB.get('whatChanged')||[],
+        res=DB.get('resources')||[], ci=DB.get('checkins')||[],
+        diary=DB.get('diary')||[], mf=DB.get('managerFeedback')||[],
+        days=DB.daysSinceReturn(), avg=DB.avgCheckin();
+
+  document.getElementById('h-name').textContent='Welcome back, '+(emp.name||'').split(' ')[0];
+  document.getElementById('h-role').textContent=emp.role||'';
+  document.getElementById('h-day').textContent='Day '+days+' of your return';
+  document.getElementById('buddy-stat').textContent=(emp.buddy||'—').split(' ').map((w,i)=>i===1?w[0]+'.':w).join(' ');
+
+  if(avg){
+    const p=Math.round((parseFloat(avg)/5)*100);
+    document.getElementById('conf-num').innerHTML=p+'<span class="conf-unit">%</span>';
+    document.getElementById('conf-bar').style.width=p+'%';
+  }
+  const done=cl.filter(c=>c.done).length;
+  document.getElementById('tasks-done').textContent=done;
+  document.getElementById('tasks-total').textContent='of '+cl.length;
+
+  // home checklist
+  document.getElementById('home-checklist').innerHTML=cl.filter(c=>c.week<=2).slice(0,4).map(item=>
+    `<div class="checklist-item" onclick="toggleItem(${item.id})">
+      <div class="check-box ${item.done?'done':''}"></div>
+      <div class="check-text ${item.done?'done':''}">${item.text}</div>
+      <div class="week-badge">Wk ${item.week}</div>
+    </div>`).join('');
+
+  // home changes
+  document.getElementById('home-changes').innerHTML=ch.slice(0,3).map(c=>
+    `<div class="list-item"><div class="list-item-cat">${c.category}</div><div class="list-item-title">${c.title}</div><div class="list-item-body">${c.body}</div></div>`).join('');
+
+  // full checklist
+  const fcl=document.getElementById('full-checklist');
+  if(fcl){
+    fcl.innerHTML=[...new Set(cl.map(c=>c.week))].map(w=>
+      `<div class="section-label">WEEK ${w}</div>`+
+      cl.filter(c=>c.week===w).map(item=>
+        `<div class="checklist-item" onclick="toggleItem(${item.id})">
+          <div class="check-box ${item.done?'done':''}"></div>
+          <div class="check-text ${item.done?'done':''}">${item.text}</div>
+          ${item.addedBy==='manager'?'<div class="week-badge" style="background:var(--pink-soft);color:var(--pink);">Manager</div>':''}
+        </div>`).join('')).join('');
+  }
+
+  // resources
+  const rl=document.getElementById('resource-list');
+  if(rl){
+    rl.innerHTML=res.map(r=>
+      `<div class="list-item flex gap-12" style="align-items:center;cursor:pointer;" onclick="showToast('Opening...')">
+        <div class="avatar avatar-md avatar-dark" style="border-radius:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--pink)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <div><div class="list-item-title" style="margin:0;">${r.title}</div><div class="text-xs text-muted">${r.category}</div></div>
+      </div>`).join('');
+  }
+
+  // manager notification on dashboard
+  const notif=document.getElementById('manager-notif');
+  if(notif){
+    notif.innerHTML=mf.length
+      ?`<div class="accent-item mt-16"><div class="accent-item-label">MESSAGE FROM YOUR MANAGER · ${mf[0].date}</div><div class="accent-item-body">${mf[0].text}</div><div style="font-size:11px;color:var(--pink);margin-top:6px;cursor:pointer;" onclick="goTo('resources',null)">See all messages in Resources →</div></div>`
+      :'';
+  }
+
+  // manager messages in resources tab
+  const mmEl=document.getElementById('manager-msgs');
+  if(mmEl){
+    mmEl.innerHTML=!mf.length
+      ?'<div class="empty">No messages from your manager yet.</div>'
+      :mf.slice(0,5).map(m=>
+        `<div class="accent-item"><div class="accent-item-label">FROM YOUR MANAGER · ${m.date}</div><div class="accent-item-body">${m.text}</div></div>`).join('');
+  }
+
+  // buddy
+  document.getElementById('buddy-avatar').textContent=initials(emp.buddy||'');
+  document.getElementById('buddy-name').textContent=emp.buddy||'—';
+  document.getElementById('manager-avatar').textContent=initials(emp.manager||'');
+  document.getElementById('manager-name').textContent=emp.manager||'—';
+
+  // checkin history
+  const ch2=document.getElementById('checkin-history');
+  if(ch2){
+    ch2.innerHTML=!ci.length
+      ?'<div class="empty">No check-ins yet. Complete your first one above!</div>'
+      :ci.slice(-5).reverse().map(c=>{
+        const dims=[c.belonging,c.confidence,c.inclusion,c.support,c.visibility];
+        const a=(dims.reduce((x,y)=>x+y,0)/5).toFixed(1);
+        return`<div class="card mt-8"><div class="flex-between"><div class="text-sm text-muted">${c.date}</div><div style="font-size:20px;font-weight:700;" class="text-pink">${a}<span class="text-muted" style="font-size:12px;font-weight:400;">/5</span></div></div>${c.note?`<div class="text-sm text-muted mt-8" style="font-style:italic;">"${c.note}"</div>`:''}</div>`;
+      }).join('');
+  }
+
+  // diary
+  const dl=document.getElementById('diary-list');
+  if(dl){
+    dl.innerHTML=!diary.length
+      ?'<div class="empty">No entries yet. Write your first one above.</div>'
+      :diary.map(e=>
+        `<div class="diary-entry">
+          <div class="diary-entry-header">
+            <span class="diary-date">${e.date}</span>
+            ${e.mood?`<span class="diary-mood">${e.mood}</span>`:''}
+          </div>
+          <div class="diary-text">${e.text}</div>
+        </div>`).join('');
+  }
+}
+
+DB.init(empId).then(() => render());
+</script>
+</body>
+</html>

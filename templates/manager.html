@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>reentry — Manager</title>
+<link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">re<span>entry</span></div>
+    <div class="sidebar-view-label">Manager View</div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-item active" onclick="goTo('home',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Overview
+      </button>
+      <button class="sidebar-item" onclick="goTo('nudge',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>Bias Nudge
+      </button>
+      <button class="sidebar-item" onclick="goTo('timeline',this)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Timeline
+      </button>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page">
+
+      <!-- OVERVIEW -->
+      <div class="section active" id="sec-home">
+        <div class="dark-header">
+          <div class="eyebrow">MANAGER VIEW — REENTRY</div>
+          <h1 id="m-title">My returner</h1>
+          <div class="sub" id="m-sub">Supporting their return</div>
+        </div>
+
+        <div class="card-dark mt-16">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+            <div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:.1em;margin-bottom:6px;">RETURNER</div>
+              <div style="font-size:18px;font-weight:600;color:white;" id="m-name">—</div>
+              <div style="font-size:13px;color:#888;" id="m-role"></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:.1em;margin-bottom:4px;">DAY</div>
+              <div style="font-family:'Instrument Serif',serif;font-size:40px;color:var(--pink);line-height:1;" id="m-day">0</div>
+            </div>
+          </div>
+          <div id="m-bars"></div>
+        </div>
+
+        <div class="stats-grid stagger">
+          <div class="stat-card">
+            <div class="stat-label">Tasks done</div>
+            <div class="stat-val" id="m-tasks">0/0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Check-ins</div>
+            <div class="stat-val" id="m-checkins">0</div>
+            <div class="stat-sub">submitted</div>
+          </div>
+        </div>
+
+        <div class="section-label">SARAH'S CHECKLIST</div>
+        <div id="sarah-checklist" class="stagger"></div>
+
+        <div class="section-label">THIS WEEK'S ACTIONS <span style="font-weight:400;color:var(--text-3);font-size:10px;letter-spacing:0;">from HR</span></div>
+        <div id="m-actions" class="stagger"></div>
+
+        <div class="section-label">SEND A MESSAGE</div>
+        <div class="card">
+          <label class="form-label">Message · employee will see this in their Resources tab</label>
+          <textarea class="form-input" id="msg-input" rows="3" placeholder="e.g. Great job on your first check-in! Let's catch up Thursday."></textarea>
+          <button class="btn btn-pink btn-full mt-16" onclick="sendMessage()">Send message →</button>
+        </div>
+        <div class="section-label">SENT MESSAGES</div>
+        <div id="msg-list" class="stagger"></div>
+      </div>
+
+      <!-- NUDGE -->
+      <div class="section" id="sec-nudge">
+        <div class="dark-header">
+          <div class="eyebrow">BIAS NUDGE</div>
+          <h1>Watch out for this</h1>
+          <div class="sub">Patterns that may unintentionally exclude</div>
+        </div>
+        <div id="nudge-list" class="stagger mt-16"></div>
+
+        <div class="section-label">CONVERSATION GUIDE</div>
+        <div id="script-list" class="stagger"></div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="section" id="sec-timeline">
+        <div class="dark-header">
+          <div class="eyebrow">TIMELINE</div>
+          <h1>30 / 60 / 90 days</h1>
+          <div class="sub" id="tl-sub">Milestones</div>
+        </div>
+
+        <div id="phase-card" class="stagger mt-16"></div>
+
+        <div class="section-label">MILESTONES</div>
+        <div class="card">
+          <div id="timeline-list"></div>
+        </div>
+
+        <div class="section-label">ADD A TASK</div>
+        <div class="card">
+          <div class="form-group" style="margin-top:0;"><label class="form-label">Task description</label><input class="form-input" id="task-text" placeholder="e.g. Shadow the planning meeting" type="text"/></div>
+          <div class="form-group"><label class="form-label">Week</label><select class="form-input" id="task-week"><option value="1">Week 1</option><option value="2">Week 2</option><option value="3" selected>Week 3</option><option value="4">Week 4</option><option value="5">Week 5</option></select></div>
+          <button class="btn btn-dark btn-full mt-16" onclick="addTask()">Add to checklist →</button>
+        </div>
+
+        <div class="section-label">MANAGER NOTES</div>
+        <div class="card">
+          <label class="form-label">Private note (only you can see this)</label>
+          <textarea class="form-input" id="note-input" rows="3" placeholder="Notes visible only to you..."></textarea>
+          <button class="btn btn-dark btn-full mt-16" onclick="addNote()">Save note →</button>
+          <div id="notes-list"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<a href="/" class="home-fab" title="Demo Portal">⌂</a>
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="goTo('home',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Overview</button>
+  <button class="nav-btn" onclick="goTo('nudge',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>Nudge</button>
+  <button class="nav-btn" onclick="goTo('timeline',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Timeline</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script src="/static/data.js"></script>
+<script>
+const empId = parseInt(new URLSearchParams(window.location.search).get('employee_id') || '1');
+
+const DEFAULT_ACTIONS = [
+  {id:'d1', text:'Schedule a 1:1 this week',       body:"A quick 20-min check-in helps them feel seen. Ask about workload and what support they need.", done:false},
+  {id:'d2', text:'Invite them to all team meetings',body:"Make sure they are on every sprint planning and team decision invite.", done:false},
+  {id:'d3', text:'Acknowledge their contribution publicly', body:"A shoutout in standup or Slack goes a long way for confidence and belonging.", done:false},
+];
+const SCRIPTS = [
+  {title:'If they seem overwhelmed',  body:'"I want to make sure your workload feels manageable. What\'s feeling like the most pressure right now — and is there anything I can take off your plate?"'},
+  {title:'If they seem left out',     body:'"I\'ve noticed you haven\'t had as much visibility in team meetings. I want to fix that — can we talk about how I can better include you in decisions?"'},
+  {title:'30-day check-in script',    body:'"You\'ve been back for a month — that\'s a big deal. What\'s been the hardest part? What\'s been better than expected? What do you need more of from me?"'},
+];
+const PHASE_INFO = {
+  1:{label:'Settling In',range:'Days 1–30',
+     hr:['Send What Changed digest','Monitor first check-in scores','Alert manager if any score < 3/5','Verify buddy assignment is active'],
+     mgr:['Weekly 1:1 every week','Invite to all team meetings','Acknowledge contributions publicly','Confirm IT access & tools complete']},
+  2:{label:'Building Momentum',range:'Days 31–60',
+     hr:['Review confidence trend at Day 30','Flag any dimension consistently < 2.5/5','Check task completion rate','Update return plan if needed'],
+     mgr:['30-day formal review meeting','Offer first visible project','Advocate in stakeholder meetings','Run a skills refresh session']},
+  3:{label:'Full Reintegration',range:'Days 61–90',
+     hr:['Prepare 90-day close-out report','Review full confidence trend','Survey manager on returner readiness'],
+     mgr:['60-day review meeting','Offer a high-visibility project','Transition to standard performance management','90-day formal close-out review']},
+};
+
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+
+function goTo(id, btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item,.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelectorAll('.sidebar-item,.nav-btn').forEach(b=>{
+    if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+  });
+  render();
+}
+
+function toggleScript(el){ el.classList.toggle('open'); }
+
+async function toggleMAction(id){
+  const actions = DB.get('managerActions') || [];
+  const item = actions.find(a=>a.id===id);
+  if(item){
+    await DB.toggleManagerAction(id, !item.done);
+    render();
+    showToast(item.done ? 'Marked incomplete' : 'Marked complete!');
+  }
+}
+
+async function dismissNudge(id){
+  await DB.dismissNudge(id);
+  render();
+  showToast('Nudge dismissed');
+}
+
+async function sendMessage(){
+  const inp = document.getElementById('msg-input');
+  if(!inp.value.trim()){ showToast('Please write a message'); return; }
+  const date = DB.getDemoDate().toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+  await DB.sendMessage(inp.value.trim(), date);
+  inp.value = '';
+  showToast('Message sent!');
+  render();
+}
+
+async function addTask(){
+  const text = document.getElementById('task-text').value.trim();
+  const week = parseInt(document.getElementById('task-week').value);
+  if(!text){ showToast('Please enter a task'); return; }
+  await DB.addChecklistItem(text, week);
+  document.getElementById('task-text').value = '';
+  showToast('Task added to checklist!');
+  render();
+}
+
+async function addNote(){
+  const inp = document.getElementById('note-input');
+  if(!inp.value.trim()) return;
+  const date = DB.getDemoDate().toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+  await DB.addManagerNote(inp.value.trim(), date);
+  inp.value = '';
+  showToast('Note saved!');
+  render();
+}
+
+function render(){
+  const emp     = DB.get('employee') || {};
+  const cl      = DB.get('checklist') || [];
+  const ci      = DB.get('checkins') || [];
+  const nudges  = DB.get('biasNudges') || [];
+  const notes   = DB.get('managerNotes') || [];
+  const days    = DB.daysSinceReturn();
+  const avg     = DB.avgCheckin();
+
+  document.getElementById('m-name').textContent = emp.name || '—';
+  document.getElementById('m-role').textContent = emp.role || '';
+  document.getElementById('m-day').textContent  = days;
+  document.getElementById('m-title').textContent = 'My returner';
+  document.getElementById('m-sub').textContent  = 'Supporting ' + (emp.name||'their').split(' ')[0] + '\'s return';
+  document.getElementById('tl-sub').textContent = (emp.name||'').split(' ')[0] + '\'s milestones';
+
+  const done = cl.filter(c=>c.done).length;
+  document.getElementById('m-tasks').textContent    = done + '/' + cl.length;
+  document.getElementById('m-checkins').textContent = ci.length;
+
+  // Confidence bars
+  const bars = document.getElementById('m-bars');
+  if(ci.length && avg){
+    const last = ci[ci.length-1];
+    bars.innerHTML = ['Belonging','Confidence','Inclusion','Support','Visibility'].map(d=>{
+      const key = d.toLowerCase(); const pct = Math.round((last[key]/5)*100);
+      return `<div style="margin-top:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:5px;">
+          <span>${d}</span><span style="color:white;">${last[key]}/5</span>
+        </div>
+        <div class="bar-bg" style="background:rgba(255,255,255,0.1);"><div class="bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
+  } else {
+    bars.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:8px;">No check-ins yet from employee.</div>';
+  }
+
+  // Checklist (read-only view for manager)
+  const scEl = document.getElementById('sarah-checklist');
+  if(scEl){
+    const weeks = [...new Set(cl.map(c=>c.week))].sort((a,b)=>a-b);
+    const doneCount = cl.filter(c=>c.done).length;
+    scEl.innerHTML = `<div class="card" style="padding:14px 16px 6px;">
+      <div class="flex-between" style="margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:600;">${doneCount} of ${cl.length} completed</div>
+        <div class="mini-bar-bg" style="width:100px;"><div class="mini-bar" style="width:${Math.round((doneCount/Math.max(cl.length,1))*100)}%;"></div></div>
+      </div>`
+      + weeks.map(w =>
+          `<div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--text-3);text-transform:uppercase;margin:10px 0 6px;">Week ${w}</div>`
+          + cl.filter(c=>c.week===w).map(item=>
+            `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+              <div class="check-box ${item.done?'done':''}"></div>
+              <div style="flex:1;font-size:13px;${item.done?'color:var(--text-3);text-decoration:line-through;':''}">${item.text}</div>
+              ${item.addedBy==='manager'?'<div class="week-badge" style="background:var(--pink-soft);color:var(--pink);font-size:9px;">You added</div>':''}
+            </div>`).join('')).join('')
+      + '</div>';
+  }
+
+  // Actions from HR
+  const mactions = DB.get('managerActions') || [];
+  const actList  = mactions.length ? mactions : DEFAULT_ACTIONS;
+  const isDefault = !mactions.length;
+  document.getElementById('m-actions').innerHTML =
+    (isDefault ? `<div style="font-size:11px;color:var(--text-3);margin-bottom:8px;padding:6px 12px;background:var(--bg-2);border-radius:var(--radius-xs);">HR hasn't sent guidance yet — showing defaults</div>` : '')
+    + actList.map(a => {
+        const def = typeof a.id === 'string';
+        return `<div class="list-item" style="border-left:3px solid ${a.done?'#5CB85C':'var(--pink)'};">
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            ${def ? '' : `<div class="check-box ${a.done?'done':''}" style="margin-top:2px;flex-shrink:0;" onclick="toggleMAction(${a.id})"></div>`}
+            <div>
+              <div class="list-item-title" style="${a.done?'text-decoration:line-through;color:var(--text-3);':''}">${a.text||a.title}</div>
+              ${a.body ? `<div class="list-item-body">${a.body}</div>` : ''}
+              ${(!def&&a.date) ? `<div class="list-item-date">${a.date} · from HR${a.done?' · ✓ done':''}</div>` : ''}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+  // Nudges
+  const nl = document.getElementById('nudge-list');
+  if(nl){
+    const active = nudges.filter(n=>!n.seen);
+    nl.innerHTML = !active.length
+      ? '<div class="empty">No active nudges. Keep up the good work!</div>'
+      : active.map(n =>
+          `<div class="accent-item">
+            <div class="accent-item-label">Bias Alert</div>
+            <div class="accent-item-body">${n.text}</div>
+            <button class="accent-item-btn" onclick="dismissNudge(${n.id})">Mark as addressed →</button>
+          </div>`).join('');
+  }
+
+  // Scripts
+  const sl = document.getElementById('script-list');
+  if(sl){
+    sl.innerHTML = SCRIPTS.map(s =>
+      `<div class="script-item" onclick="toggleScript(this)">
+        <div class="script-header">
+          <div class="script-title">${s.title}</div>
+          <svg class="script-chevron" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 10l5 5 5-5z"/></svg>
+        </div>
+        <div class="script-body">${s.body}</div>
+      </div>`).join('');
+  }
+
+  // Phase card
+  const phase = days <= 30 ? 1 : days <= 60 ? 2 : 3;
+  const p = PHASE_INFO[phase];
+  const phEl = document.getElementById('phase-card');
+  if(phEl){
+    phEl.innerHTML = `<div class="card-dark">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:.1em;margin-bottom:4px;">CURRENT PHASE</div>
+          <div style="font-size:17px;font-weight:600;color:white;">${p.label}</div>
+          <div style="font-size:12px;color:#888;margin-top:2px;">${p.range}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Instrument Serif',serif;font-size:48px;color:var(--pink);line-height:1;">${phase}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.2);">of 3</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:.08em;margin-bottom:7px;font-weight:600;">HR THIS PHASE</div>
+          ${p.hr.map(t=>`<div style="font-size:12px;color:#999;margin-bottom:5px;line-height:1.4;display:flex;gap:5px;"><span style="color:var(--pink);flex-shrink:0;">·</span>${t}</div>`).join('')}
+        </div>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:.08em;margin-bottom:7px;font-weight:600;">YOUR ROLE THIS PHASE</div>
+          ${p.mgr.map(t=>`<div style="font-size:12px;color:#999;margin-bottom:5px;line-height:1.4;display:flex;gap:5px;"><span style="color:var(--pink);flex-shrink:0;">·</span>${t}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Timeline
+  const emp2 = DB.get('employee') || {};
+  if(emp2.startDate){
+    const [sy,sm,sd] = emp2.startDate.split('-').map(Number);
+    const sd0 = new Date(sy,sm-1,sd,12,0,0);
+    const fmtD = n => { const dt=new Date(sd0.getTime()+n*86400000); return dt.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}); };
+    const mSt  = (from,to) => { if(days>(to??from)+2) return 'done'; if(days>=from-2) return 'active'; return 'upcoming'; };
+    const dynM = [
+      {label:'First day back',           date:fmtD(0),   state:days>1?'done':'active'},
+      {label:'Meet buddy &amp; IT setup',date:'Week 1',   state:days>7?'done':days>=0?'active':'upcoming'},
+      {label:'First 1:1 with manager',   date:'Week 1',   state:days>7?'done':days>=0?'active':'upcoming'},
+      {label:'30-day review',            date:fmtD(30),   state:mSt(28,32)},
+      {label:'Skills refresh complete',  date:'Week 6–7', state:days>45?'done':days>=35?'active':'upcoming'},
+      {label:'60-day review',            date:fmtD(60),   state:mSt(58,62)},
+      {label:'90-day review &amp; close-out',date:fmtD(90),state:mSt(88,95)},
+    ];
+    const tl = document.getElementById('timeline-list');
+    if(tl){
+      tl.innerHTML = dynM.map((m,i) =>
+        `<div class="timeline-item">
+          <div class="timeline-spine">
+            <div class="timeline-dot ${m.state}"></div>
+            ${i<dynM.length-1?'<div class="timeline-line"></div>':''}
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-title ${m.state==='upcoming'?'muted':''}">${m.label}</div>
+            <div class="timeline-date">${m.date}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  // Notes
+  const notEl = document.getElementById('notes-list');
+  if(notEl){
+    notEl.innerHTML = notes.length
+      ? notes.slice(0,5).map(n =>
+          `<div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
+            <div class="text-xs text-muted">${n.date}</div>
+            <div class="text-sm" style="margin-top:3px;">${n.text}</div>
+          </div>`).join('')
+      : '';
+  }
+
+  // Sent messages
+  const ml = document.getElementById('msg-list');
+  if(ml){
+    const fb = DB.get('managerFeedback') || [];
+    ml.innerHTML = !fb.length
+      ? '<div class="empty">No messages sent yet.</div>'
+      : fb.slice(0,5).map(m =>
+          `<div class="card mt-8">
+            <div class="flex-between">
+              <div class="text-xs text-muted">${m.date}</div>
+              <div class="text-xs text-muted" style="color:var(--pink);">Visible to employee</div>
+            </div>
+            <div class="text-sm" style="margin-top:6px;">${m.text}</div>
+          </div>`).join('');
+  }
+}
+
+DB.init(empId).then(() => render());
+</script>
+</body>
+</html>
