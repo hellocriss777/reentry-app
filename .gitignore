@@ -5,3 +5,11 @@ __pycache__/
 venv/
 .DS_Store
 *.egg-info/
+
+# Root-level frontend duplicates (real files are in templates/ and static/)
+data.js
+employee.html
+hr.html
+index.html
+manager.html
+style.css

@@ -33,46 +33,56 @@
 
       <!-- OVERVIEW -->
       <div class="section active" id="sec-overview">
-        <div class="dark-header">
-          <div class="eyebrow">HR DASHBOARD — REENTRY</div>
-          <h1>Overview</h1>
-          <div class="sub">All returning employees</div>
-        </div>
+        <div class="db-grid">
 
-        <div class="stats-grid stagger">
-          <div class="stat-card dark">
-            <div class="stat-label">Returners</div>
-            <div class="stat-val" id="stat-total">0</div>
-            <div class="stat-sub">active</div>
+          <!-- Row 1: Full-width HR greeting panel -->
+          <div class="panel-dark db-3">
+            <div class="panel-title-light">HR DASHBOARD — REENTRY</div>
+            <div class="dash-greeting">Team Overview</div>
+            <div class="dash-role-tag">All returning employees at a glance</div>
+            <div class="dash-meta-row" style="margin-top:10px;">
+              <div class="dash-meta-item">
+                <div class="dash-meta-val" id="stat-total">0</div>
+                <div class="dash-meta-label">RETURNERS</div>
+              </div>
+              <div class="dash-meta-item">
+                <div class="dash-meta-val" id="stat-attention">0</div>
+                <div class="dash-meta-label">NEED ATTENTION</div>
+              </div>
+            </div>
           </div>
-          <div class="stat-card pink">
-            <div class="stat-label">Need attention</div>
-            <div class="stat-val" id="stat-attention">0</div>
-            <div class="stat-sub">low confidence</div>
+
+          <!-- Row 2: Returner list (2 col wide) -->
+          <div class="panel db-2">
+            <div class="panel-title">ALL RETURNERS</div>
+            <div id="returner-list"></div>
           </div>
-        </div>
 
-        <div class="section-label">ATTENTION NEEDED</div>
-        <div id="attention-list"></div>
+          <!-- Row 2: Manager guidance quick-send (1 col) -->
+          <div class="panel">
+            <div class="panel-title">SEND MANAGER GUIDANCE</div>
+            <label class="form-label" style="font-size:11px;">Select employee</label>
+            <select class="form-input" id="maction-emp" style="margin-bottom:8px;font-size:12px;padding:7px 10px;"></select>
+            <label class="form-label" style="font-size:11px;">Action item for the manager</label>
+            <input class="form-input" id="maction-text" placeholder="e.g. Invite Sarah to planning meeting" type="text" style="font-size:12px;padding:7px 10px;"/>
+            <button class="btn btn-dark btn-full mt-16" style="font-size:12px;" onclick="saveMAction()">Send to manager →</button>
+            <div id="maction-list" style="margin-top:12px;"></div>
+          </div>
 
-        <div class="section-label">ALL RETURNERS</div>
-        <div id="returner-list" class="stagger"></div>
+          <!-- Row 3: Needs attention (1 col) -->
+          <div class="panel">
+            <div class="panel-title">NEEDS ATTENTION</div>
+            <div id="attention-list"></div>
+          </div>
 
-        <div class="section-label">MANAGER GUIDANCE <span style="font-weight:400;color:var(--text-3);font-size:10px;letter-spacing:0;">send action items to manager</span></div>
-        <div class="card">
-          <label class="form-label">Select employee</label>
-          <select class="form-input" id="maction-emp" style="margin-bottom:10px;"></select>
-          <label class="form-label">Action item for the manager this week</label>
-          <input class="form-input" id="maction-text" placeholder="e.g. Invite Sarah to the planning meeting this week" type="text"/>
-          <button class="btn btn-dark btn-full mt-16" onclick="saveMAction()">Send to manager →</button>
-        </div>
-        <div id="maction-list" class="stagger"></div>
+          <!-- Row 3: Confidence trend chart (2 col wide) -->
+          <div class="panel db-2">
+            <div class="panel-title">CONFIDENCE TREND</div>
+            <div class="text-sm text-muted" style="margin-bottom:12px;">Average check-in score over time</div>
+            <div class="chart-wrap" style="height:140px;"><canvas id="trend-chart"></canvas></div>
+          </div>
 
-        <div class="section-label">CONFIDENCE TREND</div>
-        <div class="card">
-          <div class="text-sm text-muted" style="margin-bottom:12px;">Average check-in score over time</div>
-          <div class="chart-wrap" style="height:140px;"><canvas id="trend-chart"></canvas></div>
-        </div>
+        </div><!-- /db-grid -->
       </div>
 
       <!-- ADD -->
@@ -105,7 +115,8 @@
           <div class="sub">Updates visible to the returning employee</div>
         </div>
         <div class="card mt-16">
-          <div class="form-group" style="margin-top:0;"><label class="form-label">Category</label><select class="form-input" id="dig-cat"><option>Process</option><option>Tools</option><option>Team</option><option>Policy</option><option>Other</option></select></div>
+          <div class="form-group" style="margin-top:0;"><label class="form-label">Date</label><input type="date" class="form-input" id="dig-date" style="max-width:200px;"/></div>
+          <div class="form-group"><label class="form-label">Category</label><select class="form-input" id="dig-cat"><option>Process</option><option>Tools</option><option>Team</option><option>Policy</option><option>Other</option></select></div>
           <div class="form-group"><label class="form-label">Title</label><input class="form-input" id="dig-title" placeholder="e.g. Standup moved to 9am" type="text"/></div>
           <div class="form-group"><label class="form-label">Details</label><textarea class="form-input" id="dig-body" rows="3" placeholder="What should the employee know about this change?"></textarea></div>
           <button class="btn btn-pink btn-full mt-16" onclick="saveDigest()">Publish update →</button>
@@ -159,6 +170,14 @@ function showToast(msg){ const t=document.getElementById('toast'); t.textContent
 function initials(n){ return (n||'?').split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2); }
 
 function goTo(id, btn){
+  if(window.innerWidth >= 900){
+    document.getElementById('sec-'+id).scrollIntoView({behavior:'smooth', block:'start'});
+    document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(b=>{
+      if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+    });
+    return;
+  }
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sidebar-item,.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
@@ -194,20 +213,22 @@ async function saveMAction(){
   const text  = document.getElementById('maction-text').value.trim();
   const empId = parseInt(document.getElementById('maction-emp').value);
   if(!text){ showToast('Please enter an action item'); return; }
-  const date = DB.getDemoDate().toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+  const d = DB.getDemoDate();
+  const date = d.toLocaleDateString('en-AU',{day:'numeric',month:'short'});
   await DB.addManagerAction(empId, text, date);
   document.getElementById('maction-text').value='';
   showToast('Action sent to manager!');
   render();
 }
 
+function toISOStr(date){ return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0'); }
+
 async function saveDigest(){
   const cat   = document.getElementById('dig-cat').value;
   const title = document.getElementById('dig-title').value.trim();
   const body  = document.getElementById('dig-body').value.trim();
   if(!title||!body){ showToast('Please fill in title and details'); return; }
-  const d = DB.getDemoDate();
-  const iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const iso = document.getElementById('dig-date').value || toISOStr(DB.getDemoDate());
   await DB.addChange(cat, title, body, iso);
   document.getElementById('dig-title').value='';
   document.getElementById('dig-body').value='';
@@ -267,11 +288,11 @@ function render(){
         }).join('');
   }
 
-  // Returner list
+  // Returner list — compact returner-row style
   const rl = document.getElementById('returner-list');
   if(rl){
     if(!employees.length){
-      rl.innerHTML = '<div class="empty">No returners yet. Add one using the form →</div>';
+      rl.innerHTML = '<div class="empty">No returners yet. Add one in the Add Returner tab →</div>';
     } else {
       rl.innerHTML = employees.map((e,i) => {
         const ci = allCheckins[i] || [];
@@ -280,14 +301,17 @@ function render(){
         const needAttn = avg && parseFloat(avg) < 3;
         const [y,m,d] = (e.start_date||'2026-01-01').split('-').map(Number);
         const days = Math.max(0, Math.floor((DB.getDemoDate() - new Date(y,m-1,d,12,0,0)) / 86400000));
-        return `<div class="person-row">
+        return `<div class="returner-row">
           <div class="avatar avatar-md avatar-dark">${initials(e.name)}</div>
-          <div style="flex:1;">
-            <div class="person-name">${e.name}</div>
-            <div class="person-sub">Day ${days} · ${e.role} · <a href="/employee?id=${e.id}" style="color:var(--pink);text-decoration:none;">open view →</a></div>
+          <div class="returner-info">
+            <div class="returner-name">${e.name}</div>
+            <div class="returner-meta">Day ${days} · ${e.role}</div>
             <div class="mini-bar-bg"><div class="mini-bar" style="width:${pct}%"></div></div>
           </div>
-          <div class="dot ${needAttn?'dot-pink':'dot-green'}"></div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+            <div class="dot ${needAttn?'dot-pink':'dot-green'}"></div>
+            <a href="/employee?id=${e.id}" style="font-size:10px;color:var(--pink);text-decoration:none;white-space:nowrap;">open →</a>
+          </div>
         </div>`;
       }).join('');
     }
@@ -367,7 +391,10 @@ function render(){
   ]:[{label:'No data',data:[0],borderColor:'#ddd',borderWidth:1,fill:false}], trackC);
 }
 
-DB.initHR().then(() => render());
+DB.initHR().then(() => {
+  document.getElementById('dig-date').value = toISOStr(DB.getDemoDate());
+  render();
+});
 </script>
 </body>
 </html>

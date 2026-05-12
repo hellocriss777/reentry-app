@@ -51,42 +51,72 @@
 
       <!-- HOME -->
       <div class="section active" id="sec-home">
-        <div class="dark-header">
-          <div class="eyebrow">REENTRY — EMPLOYEE</div>
-          <h1 id="h-name">Welcome back</h1>
-          <div class="sub" id="h-role"></div>
-          <div class="day-pill"><div class="day-pill-dot"></div><span id="h-day">Day 0 of your return</span></div>
-        </div>
 
-        <div class="card-dark mt-16">
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:.1em;margin-bottom:8px;">CONFIDENCE SCORE</div>
-          <div class="flex-between">
-            <div class="conf-number" id="conf-num">—</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.3);">from check-ins</div>
-          </div>
-          <div style="margin-top:14px;" class="bar-dark">
-            <div class="bar-bg"><div class="bar-fill" id="conf-bar" style="width:0%"></div></div>
-          </div>
-        </div>
+        <!-- ── Desktop dashboard grid (stacks naturally on mobile) ── -->
+        <div class="db-grid">
 
-        <div class="stats-grid stagger">
-          <div class="stat-card">
-            <div class="stat-label">Tasks done</div>
-            <div class="stat-val" id="tasks-done">0</div>
-            <div class="stat-sub" id="tasks-total">of 7</div>
+          <!-- Row 1: Full-width greeting panel -->
+          <div class="panel-dark db-3">
+            <div class="panel-title-light">REENTRY — EMPLOYEE</div>
+            <div class="dash-greeting" id="h-name">Welcome back</div>
+            <div class="dash-role-tag" id="h-role"></div>
+            <div class="dash-meta-row">
+              <div class="dash-meta-item">
+                <div class="dash-meta-val" id="h-day-num">0</div>
+                <div class="dash-meta-label">DAYS BACK</div>
+              </div>
+              <div class="dash-meta-item">
+                <div class="dash-meta-val" id="conf-num">—</div>
+                <div class="dash-meta-label">CONFIDENCE</div>
+              </div>
+              <div class="dash-meta-item">
+                <div class="dash-meta-val" id="tasks-done">0</div>
+                <div class="dash-meta-label" id="tasks-total">TASKS DONE</div>
+              </div>
+              <div style="flex:1"></div>
+              <div class="day-pill" style="align-self:center;"><div class="day-pill-dot"></div><span id="h-day">Day 0 of your return</span></div>
+            </div>
+            <div class="dash-conf-bar" style="margin-top:16px;">
+              <div class="dash-conf-fill" id="conf-bar" style="width:0%"></div>
+            </div>
           </div>
-          <div class="stat-card pink">
-            <div class="stat-label">My buddy</div>
-            <div class="stat-val" style="font-size:16px;line-height:1.2;" id="buddy-stat">—</div>
-            <div class="stat-sub">tap to contact</div>
-          </div>
-        </div>
 
-        <div id="manager-notif"></div>
-        <div class="section-label">THIS WEEK</div>
-        <div id="home-checklist" class="stagger"></div>
-        <div class="section-label">WHAT CHANGED WHILE YOU WERE AWAY</div>
-        <div id="home-changes" class="stagger"></div>
+          <!-- Row 2: Checklist (2 col) -->
+          <div class="panel db-2">
+            <div class="panel-title">MY CHECKLIST — THIS WEEK</div>
+            <div id="home-checklist"></div>
+            <span class="panel-link" onclick="goTo('checklist',null)">View all tasks →</span>
+          </div>
+
+          <!-- Row 2: Quick Check-in CTA -->
+          <div class="cta-card">
+            <div class="cta-icon">✓</div>
+            <div class="cta-title">Weekly Check-in</div>
+            <div class="cta-sub">Share how you're feeling with your HR team · takes 2 mins</div>
+            <button class="cta-btn" onclick="goTo('checkin',null)">Start check-in →</button>
+          </div>
+
+          <!-- Row 3: What Changed -->
+          <div class="panel">
+            <div class="panel-title">WHAT CHANGED WHILE YOU WERE AWAY</div>
+            <div id="home-changes"></div>
+          </div>
+
+          <!-- Row 3: Manager + Buddy -->
+          <div class="panel">
+            <div class="panel-title">FROM YOUR MANAGER</div>
+            <div id="manager-notif"></div>
+            <div id="dash-buddy"></div>
+          </div>
+
+          <!-- Row 3: Resources quick links -->
+          <div class="panel">
+            <div class="panel-title">RESOURCES</div>
+            <div id="dash-resources"></div>
+            <span class="panel-link" onclick="goTo('resources',null)">View all →</span>
+          </div>
+
+        </div><!-- /db-grid -->
       </div>
 
       <!-- CHECKLIST -->
@@ -108,6 +138,10 @@
         </div>
         <div class="card mt-16">
           <div id="checkin-form">
+            <div class="form-group" style="margin-top:0;">
+              <label class="form-label">Date of this check-in</label>
+              <input type="date" class="form-input" id="checkin-date" style="max-width:200px;"/>
+            </div>
             <div class="slider-row"><div class="slider-label">Sense of belonging<span class="val" id="v-belonging">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('belonging',this.value)"/></div>
             <div class="slider-row"><div class="slider-label">Confidence at work<span class="val" id="v-confidence">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('confidence',this.value)"/></div>
             <div class="slider-row"><div class="slider-label">Feeling included<span class="val" id="v-inclusion">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('inclusion',this.value)"/></div>
@@ -146,6 +180,10 @@
             <button class="mood-btn" onclick="selectMood(this,'Frustrated')">😤 Frustrated</button>
           </div>
           <div class="form-group" style="margin-top:0;">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-input" id="diary-date" style="max-width:200px;"/>
+          </div>
+          <div class="form-group">
             <label class="form-label">Write about your day</label>
             <textarea class="form-input" id="diary-text" rows="5" placeholder="What happened today? How did it make you feel? What are you proud of? What was hard?"></textarea>
           </div>
@@ -204,6 +242,16 @@ function initials(n){ return (n||'?').split(' ').map(x=>x[0]).join('').toUpperCa
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
 
 function goTo(id, btn){
+  if(window.innerWidth >= 900){
+    // Desktop: scroll to section, keep all visible
+    document.getElementById('sec-'+id).scrollIntoView({behavior:'smooth', block:'start'});
+    document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(b=>{
+      if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+    });
+    return;
+  }
+  // Mobile: classic tab switch
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sidebar-item,.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
@@ -230,8 +278,15 @@ async function toggleItem(id){
   }
 }
 
+function toDisplayDate(isoStr){
+  const [y,m,d] = isoStr.split('-').map(Number);
+  return new Date(y,m-1,d).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+}
+function toISOStr(date){ return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0'); }
+
 async function submitCheckin(){
-  const today = DB.getDemoDate().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+  const raw = document.getElementById('checkin-date').value || toISOStr(DB.getDemoDate());
+  const today = toDisplayDate(raw);
   await DB.submitCheckin({date:today, ...sv, note:document.getElementById('checkin-note').value});
   document.getElementById('checkin-form').style.display='none';
   document.getElementById('checkin-done').style.display='block';
@@ -247,7 +302,8 @@ async function submitCheckin(){
 async function saveDiary(){
   const text = document.getElementById('diary-text').value.trim();
   if(!text){ showToast('Write something first'); return; }
-  const today = DB.getDemoDate().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+  const raw = document.getElementById('diary-date').value || toISOStr(DB.getDemoDate());
+  const today = toDisplayDate(raw);
   await DB.addDiaryEntry(text, today, selectedMood);
   document.getElementById('diary-text').value='';
   selectedMood='';
@@ -265,28 +321,32 @@ function render(){
   document.getElementById('h-name').textContent='Welcome back, '+(emp.name||'').split(' ')[0];
   document.getElementById('h-role').textContent=emp.role||'';
   document.getElementById('h-day').textContent='Day '+days+' of your return';
-  document.getElementById('buddy-stat').textContent=(emp.buddy||'—').split(' ').map((w,i)=>i===1?w[0]+'.':w).join(' ');
+  document.getElementById('h-day-num').textContent=days;
 
   if(avg){
     const p=Math.round((parseFloat(avg)/5)*100);
-    document.getElementById('conf-num').innerHTML=p+'<span class="conf-unit">%</span>';
+    document.getElementById('conf-num').textContent=p+'%';
     document.getElementById('conf-bar').style.width=p+'%';
   }
   const done=cl.filter(c=>c.done).length;
   document.getElementById('tasks-done').textContent=done;
-  document.getElementById('tasks-total').textContent='of '+cl.length;
+  document.getElementById('tasks-total').textContent='OF '+cl.length+' TASKS';
 
-  // home checklist
-  document.getElementById('home-checklist').innerHTML=cl.filter(c=>c.week<=2).slice(0,4).map(item=>
-    `<div class="checklist-item" onclick="toggleItem(${item.id})">
-      <div class="check-box ${item.done?'done':''}"></div>
-      <div class="check-text ${item.done?'done':''}">${item.text}</div>
-      <div class="week-badge">Wk ${item.week}</div>
-    </div>`).join('');
+  // home checklist — compact dash-check-item style
+  document.getElementById('home-checklist').innerHTML=cl.filter(c=>c.week<=2).slice(0,5).map(item=>
+    `<div class="dash-check-item" onclick="toggleItem(${item.id})">
+      <div class="check-box ${item.done?'done':''}" style="flex-shrink:0;"></div>
+      <div class="check-text ${item.done?'done':''}" style="font-size:13px;flex:1;">${item.text}</div>
+      <div class="week-badge" style="flex-shrink:0;">Wk ${item.week}</div>
+    </div>`).join('') || '<div class="empty">No tasks yet.</div>';
 
-  // home changes
+  // home changes — compact dash-change-item style
   document.getElementById('home-changes').innerHTML=ch.slice(0,3).map(c=>
-    `<div class="list-item"><div class="list-item-cat">${c.category}</div><div class="list-item-title">${c.title}</div><div class="list-item-body">${c.body}</div></div>`).join('');
+    `<div class="dash-change-item">
+      <div class="dash-change-cat">${c.category}</div>
+      <div class="dash-change-title">${c.title}</div>
+      <div class="dash-change-body">${c.body}</div>
+    </div>`).join('') || '<div class="empty">Nothing yet.</div>';
 
   // full checklist
   const fcl=document.getElementById('full-checklist');
@@ -311,12 +371,34 @@ function render(){
       </div>`).join('');
   }
 
-  // manager notification on dashboard
+  // manager message panel + buddy panel
   const notif=document.getElementById('manager-notif');
   if(notif){
     notif.innerHTML=mf.length
-      ?`<div class="accent-item mt-16"><div class="accent-item-label">MESSAGE FROM YOUR MANAGER · ${mf[0].date}</div><div class="accent-item-body">${mf[0].text}</div><div style="font-size:11px;color:var(--pink);margin-top:6px;cursor:pointer;" onclick="goTo('resources',null)">See all messages in Resources →</div></div>`
-      :'';
+      ?`<div class="dash-change-item" style="border:none;padding:0;">
+          <div class="dash-change-cat">${mf[0].date}</div>
+          <div class="dash-change-body" style="font-size:12px;line-height:1.5;">"${mf[0].text}"</div>
+          <span style="font-size:11px;color:var(--pink);cursor:pointer;margin-top:6px;display:block;" onclick="goTo('resources',null)">See all messages →</span>
+        </div>`
+      :'<div class="empty" style="font-size:12px;">No messages yet.</div>';
+  }
+  const buddyEl=document.getElementById('dash-buddy');
+  if(buddyEl && emp.buddy){
+    buddyEl.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+      <div class="avatar avatar-md avatar-pink">${initials(emp.buddy)}</div>
+      <div><div style="font-size:13px;font-weight:600;color:var(--text);">${emp.buddy}</div><div style="font-size:11px;color:var(--text-3);">Your buddy</div></div>
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="showToast('Opening email...')">✉</button>
+    </div>`;
+  }
+
+  // dash resources
+  const dr=document.getElementById('dash-resources');
+  if(dr){
+    dr.innerHTML=res.slice(0,3).map(r=>
+      `<div class="dash-change-item" style="cursor:pointer;" onclick="showToast('Opening...')">
+        <div class="dash-change-cat">${r.category}</div>
+        <div class="dash-change-title" style="font-size:12px;">${r.title}</div>
+      </div>`).join('') || '<div class="empty" style="font-size:12px;">No resources yet.</div>';
   }
 
   // manager messages in resources tab
@@ -362,7 +444,12 @@ function render(){
   }
 }
 
-DB.init(empId).then(() => render());
+DB.init(empId).then(() => {
+  const iso = toISOStr(DB.getDemoDate());
+  document.getElementById('checkin-date').value = iso;
+  document.getElementById('diary-date').value = iso;
+  render();
+});
 </script>
 </body>
 </html>

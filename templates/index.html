@@ -9,51 +9,6 @@
 a.sidebar-item { text-decoration: none; }
 a.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #ccc; }
 
-.role-grid {
-  display: grid; grid-template-columns: 1fr; gap: 10px;
-}
-@media (min-width: 560px) { .role-grid { grid-template-columns: repeat(3,1fr); } }
-
-.role-card {
-  display: block; text-decoration: none;
-  background: var(--card-raised); border: 1.5px solid var(--border);
-  border-radius: var(--radius); padding: 18px 18px 48px;
-  position: relative; overflow: hidden;
-  transition: transform .18s, box-shadow .18s, border-color .18s;
-  box-shadow: var(--shadow); cursor: pointer;
-}
-.role-card:hover { border-color: var(--pink); transform: translateY(-3px); box-shadow: var(--shadow-md); }
-.role-stripe { position: absolute; top:0; left:0; right:0; height:3px; }
-.stripe-emp { background: var(--pink); }
-.stripe-hr  { background: var(--dark); }
-.stripe-mgr { background: linear-gradient(90deg, var(--pink), var(--dark)); }
-.role-tag  { font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--text-3); margin-bottom:6px; }
-.role-name { font-family:'Instrument Serif',serif; font-size:20px; color:var(--text); margin-bottom:4px; }
-.role-sub  { font-size:12px; color:var(--text-2); line-height:1.45; margin-bottom:10px; }
-.role-features { list-style:none; display:flex; flex-direction:column; gap:4px; }
-.role-features li { font-size:11px; color:var(--text-3); display:flex; align-items:center; gap:6px; }
-.role-features li::before { content:''; width:4px; height:4px; border-radius:50%; background:var(--pink); flex-shrink:0; }
-.role-arrow { position:absolute; bottom:16px; right:16px; font-size:18px; color:var(--pink); opacity:.4; transition:opacity .18s,transform .18s; }
-.role-card:hover .role-arrow { opacity:1; transform:translateX(4px); }
-
-/* Picker inside role card */
-.role-picker { margin-top:14px; padding-top:14px; border-top:1px solid var(--border); display:none; }
-.role-picker.open { display:block; }
-.picker-label { font-size:11px; color:var(--text-3); margin-bottom:6px; }
-.picker-row { display:flex; gap:8px; align-items:center; }
-.picker-select { flex:1; background:var(--bg-2); border:1px solid var(--border-strong); border-radius:var(--radius-xs); padding:8px 10px; font-size:13px; font-family:'Outfit',sans-serif; color:var(--text); }
-.picker-go { padding:8px 16px; background:var(--pink); color:white; border:none; border-radius:var(--radius-xs); font-size:13px; font-weight:600; font-family:'Outfit',sans-serif; cursor:pointer; white-space:nowrap; }
-.picker-go:hover { background:#c0486f; }
-.picker-empty { font-size:12px; color:var(--text-3); font-style:italic; }
-
-.demo-ctrl {
-  background: var(--card-raised); border: 1.5px solid var(--border-strong);
-  border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-md);
-}
-.ctrl-row { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:12px; flex-wrap:wrap; }
-.day-big  { font-family:'Instrument Serif',serif; font-size:40px; color:var(--pink); line-height:1; }
-.day-label { font-size:11px; color:var(--text-3); }
-.presets { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
 .preset-btn {
   font-size:12px; font-weight:500; padding:6px 12px; border-radius:20px;
   border:1.5px solid var(--border-strong); background:transparent; color:var(--text-2);
@@ -61,17 +16,6 @@ a.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #ccc; }
 }
 .preset-btn:hover { border-color:var(--pink); color:var(--pink); }
 .preset-btn.active { background:var(--pink); border-color:var(--pink); color:white; }
-.ctrl-reset { font-size:12px; color:var(--text-3); cursor:pointer; background:none; border:none; font-family:inherit; transition:color .15s; padding:0; }
-.ctrl-reset:hover { color:var(--pink); }
-
-.steps-card { background:var(--card-raised); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
-.step { display:flex; gap:14px; padding:14px 18px; border-bottom:1px solid var(--border); transition:background .15s; }
-.step:last-child { border-bottom:none; }
-.step:hover { background:var(--bg-2); }
-.step-num { width:26px; height:26px; border-radius:50%; background:var(--dark); color:white; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
-.step-view-tag { font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--pink); margin-bottom:2px; }
-.step-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:2px; }
-.step-body  { font-size:12px; color:var(--text-2); line-height:1.5; }
 
 .stat-row-4 { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
 @media (min-width:560px) { .stat-row-4 { grid-template-columns:repeat(4,1fr); } }
@@ -90,7 +34,7 @@ a.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #ccc; }
     <nav class="sidebar-nav">
       <button class="sidebar-item active">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        Demo Controls
+        Overview
       </button>
     </nav>
     <div class="sidebar-view-label" style="margin-top:24px;">OPEN A VIEW</div>
@@ -114,151 +58,296 @@ a.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #ccc; }
     <div class="page">
       <div class="section active" id="sec-home">
 
-        <div class="dark-header">
-          <div class="eyebrow">DECO7180 · A03 · UQ · TEAM POCHITA</div>
-          <h1>reentry</h1>
-          <div class="sub">A structured return-to-work platform for women coming back from parental or medical leave — three coordinated views, one shared database.</div>
-        </div>
-
-        <div class="section-label">DEMO CONTROLS</div>
-        <div class="demo-ctrl">
-          <div class="ctrl-row">
-            <div>
-              <div style="font-size:14px;font-weight:600;color:var(--text);">Set demo date</div>
-              <div style="font-size:12px;color:var(--text-3);margin-top:2px;margin-bottom:12px;">Controls "Day X" counter across all three views</div>
-              <input type="date" class="form-input" id="date-picker" oninput="onDateInput(this.value)" style="max-width:200px;"/>
-            </div>
-            <div style="text-align:right;flex-shrink:0;">
-              <div class="day-big" id="day-num">—</div>
-              <div class="day-label">days since return</div>
-            </div>
-          </div>
-          <div class="presets">
-            <button class="preset-btn" onclick="setDay(1,this)">Day 1</button>
-            <button class="preset-btn" onclick="setDay(7,this)">Day 7</button>
-            <button class="preset-btn" onclick="setDay(14,this)">Day 14</button>
-            <button class="preset-btn" onclick="setDay(30,this)">Day 30</button>
-            <button class="preset-btn" onclick="setDay(60,this)">Day 60</button>
-            <button class="preset-btn" onclick="setDay(90,this)">Day 90</button>
-          </div>
-          <div style="display:flex;justify-content:flex-end;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
-            <button class="ctrl-reset" onclick="resetAll()">Reset all demo data →</button>
+        <!-- Hero -->
+        <div class="index-hero">
+          <div class="index-hero-eyebrow">DECO7180 · A03 · UQ · TEAM POCHITA</div>
+          <h1>re<span>entry</span></h1>
+          <div class="index-hero-sub">A structured return-to-work platform for women coming back from parental or medical leave — three coordinated views, one shared database.</div>
+          <div class="index-hero-tags">
+            <span class="index-tag">3 coordinated views</span>
+            <span class="index-tag">Live database</span>
+            <span class="index-tag">Confidence tracking</span>
+            <span class="index-tag">Bias nudges</span>
+            <span class="index-tag">Private diary</span>
           </div>
         </div>
 
-        <div class="section-label">OPEN A VIEW</div>
-        <div class="role-grid">
+        <!-- Demo controls — compact horizontal bar -->
+        <div class="demo-ctrl-compact" style="margin-top:16px;">
+          <div style="flex-shrink:0;">
+            <div class="demo-day-display" id="day-num">—</div>
+            <div class="demo-day-label">days since return</div>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-3);margin-bottom:7px;">SET DEMO DATE</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="preset-btn" onclick="setDay(1,this)">Day 1</button>
+              <button class="preset-btn" onclick="setDay(7,this)">Day 7</button>
+              <button class="preset-btn" onclick="setDay(14,this)">Day 14</button>
+              <button class="preset-btn" onclick="setDay(30,this)">Day 30</button>
+              <button class="preset-btn" onclick="setDay(60,this)">Day 60</button>
+              <button class="preset-btn" onclick="setDay(90,this)">Day 90</button>
+            </div>
+          </div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+            <input type="date" class="form-input" id="date-picker" oninput="onDateInput(this.value)" style="font-size:12px;padding:7px 10px;width:160px;"/>
+            <button onclick="resetAll()" style="font-size:11px;color:var(--text-3);cursor:pointer;background:none;border:none;font-family:inherit;padding:0;white-space:nowrap;" onmouseover="this.style.color='var(--pink)'" onmouseout="this.style.color='var(--text-3)'">↺ Reset all demo data</button>
+          </div>
+        </div>
+
+        <!-- Role cards -->
+        <div class="section-label" style="margin-top:20px;">OPEN A VIEW</div>
+        <div class="role-grid-new">
 
           <!-- HR — direct link, no picker needed -->
-          <a class="role-card" href="/hr">
-            <div class="role-stripe stripe-hr"></div>
-            <div class="role-tag">HR</div>
-            <div class="role-name">HR Dashboard</div>
-            <div class="role-sub">Monitor returners &amp; publish updates</div>
-            <ul class="role-features">
-              <li>Attention alerts</li>
-              <li>Add / configure returner</li>
+          <a class="role-card-new" href="/hr">
+            <div class="role-card-top">
+              <div class="role-icon role-icon-hr">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--dark)"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+              </div>
+              <span class="role-badge role-badge-hr">HR</span>
+            </div>
+            <div class="role-card-name">HR Dashboard</div>
+            <div class="role-card-sub">Monitor returners &amp; publish updates</div>
+            <ul class="role-card-features">
+              <li>Attention alerts &amp; confidence tracker</li>
+              <li>Add / configure returners</li>
               <li>Publish What Changed digest</li>
-              <li>Confidence tracker chart</li>
+              <li>Send guidance to managers</li>
             </ul>
-            <div class="role-arrow">→</div>
           </a>
 
           <!-- Employee — needs picker -->
-          <div class="role-card" onclick="togglePicker('emp')">
-            <div class="role-stripe stripe-emp"></div>
-            <div class="role-tag">EMPLOYEE</div>
-            <div class="role-name">Returning Employee</div>
-            <div class="role-sub">Dashboard, check-in &amp; diary</div>
-            <ul class="role-features">
-              <li>Confidence score &amp; check-in</li>
-              <li>Weekly milestone checklist</li>
-              <li>Private diary</li>
-              <li>Resources, buddy &amp; messages</li>
+          <div class="role-card-new" onclick="togglePicker('emp')">
+            <div class="role-card-top">
+              <div class="role-icon role-icon-emp">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--pink)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+              </div>
+              <span class="role-badge role-badge-emp">EMPLOYEE</span>
+            </div>
+            <div class="role-card-name">Returning Employee</div>
+            <div class="role-card-sub">Dashboard, check-in &amp; private diary</div>
+            <ul class="role-card-features">
+              <li>Confidence score &amp; weekly check-in</li>
+              <li>Milestone checklist</li>
+              <li>Private diary with mood tracking</li>
+              <li>Resources, buddy &amp; manager messages</li>
             </ul>
-            <div class="role-arrow">↓</div>
-            <div class="role-picker" id="picker-emp" onclick="event.stopPropagation()">
-              <div class="picker-label">Select employee</div>
-              <div class="picker-row">
-                <select class="picker-select" id="select-emp">
-                  <option value="">Loading…</option>
-                </select>
-                <button class="picker-go" onclick="goEmployee()">Go →</button>
+            <div class="role-picker-inline" id="picker-emp" onclick="event.stopPropagation()">
+              <div style="font-size:11px;color:var(--text-3);margin-bottom:6px;">Select employee</div>
+              <div class="role-picker-row">
+                <select class="picker-sel" id="select-emp"><option value="">Loading…</option></select>
+                <button class="picker-go-btn" onclick="goEmployee()">Go →</button>
               </div>
             </div>
           </div>
 
           <!-- Manager — needs picker -->
-          <div class="role-card" onclick="togglePicker('mgr')">
-            <div class="role-stripe stripe-mgr"></div>
-            <div class="role-tag">MANAGER</div>
-            <div class="role-name">Manager View</div>
-            <div class="role-sub">Actions, feedback &amp; bias check</div>
-            <ul class="role-features">
+          <div class="role-card-new" onclick="togglePicker('mgr')">
+            <div class="role-card-top">
+              <div class="role-icon role-icon-mgr">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--dark)"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+              </div>
+              <span class="role-badge role-badge-mgr">MANAGER</span>
+            </div>
+            <div class="role-card-name">Manager View</div>
+            <div class="role-card-sub">Actions, feedback &amp; bias check</div>
+            <ul class="role-card-features">
               <li>Confidence overview · all 5 dimensions</li>
               <li>Bias nudge alerts</li>
-              <li>Send a message</li>
-              <li>Add tasks to checklist</li>
+              <li>Send a message to the employee</li>
+              <li>Add tasks to the checklist</li>
             </ul>
-            <div class="role-arrow">↓</div>
-            <div class="role-picker" id="picker-mgr" onclick="event.stopPropagation()">
-              <div class="picker-label">Select employee to manage</div>
-              <div class="picker-row">
-                <select class="picker-select" id="select-mgr">
-                  <option value="">Loading…</option>
-                </select>
-                <button class="picker-go" onclick="goManager()">Go →</button>
+            <div class="role-picker-inline" id="picker-mgr" onclick="event.stopPropagation()">
+              <div style="font-size:11px;color:var(--text-3);margin-bottom:6px;">Select employee to manage</div>
+              <div class="role-picker-row">
+                <select class="picker-sel" id="select-mgr"><option value="">Loading…</option></select>
+                <button class="picker-go-btn" onclick="goManager()">Go →</button>
               </div>
             </div>
           </div>
 
-        </div>
+        </div><!-- /role-grid-new -->
 
-        <div class="section-label">HOW TO DEMO</div>
-        <div class="steps-card">
-          <div class="step">
-            <div class="step-num">1</div>
-            <div>
-              <div class="step-view-tag">HR VIEW</div>
-              <div class="step-title">Set up Sarah's return</div>
-              <div class="step-body">Go to HR → Change Digest. Publish a "What Changed" update. Or go to Add Returner to create a new employee.</div>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">2</div>
-            <div>
-              <div class="step-view-tag">EMPLOYEE VIEW</div>
-              <div class="step-title">Sarah checks in for the first time</div>
-              <div class="step-body">Set demo date to Day 7. Open Employee → see the What Changed card. Go to Weekly Check-in and submit with low scores (2–3 /5).</div>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">3</div>
-            <div>
-              <div class="step-view-tag">HR VIEW</div>
-              <div class="step-title">HR sees the confidence alert</div>
-              <div class="step-body">Return to HR → Overview. The Attention Needed count increases and the confidence trend chart updates in real time.</div>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">4</div>
-            <div>
-              <div class="step-view-tag">MANAGER VIEW</div>
-              <div class="step-title">Manager responds and sends feedback</div>
-              <div class="step-body">Open Manager → low confidence bars visible across all 5 dimensions. Dismiss a Bias Nudge, send a message to Sarah, add a task to her checklist.</div>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">5</div>
-            <div>
-              <div class="step-view-tag">EMPLOYEE VIEW</div>
-              <div class="step-title">Sarah sees the manager's message</div>
-              <div class="step-body">Return to Employee → Resources &amp; Buddy. The "From Your Manager" section shows Tom's message live. The new task appears in her checklist. She can write a diary entry about how she's feeling.</div>
-            </div>
-          </div>
-        </div>
+        <!-- Three-role demo guide -->
+        <div class="section-label" style="margin-top:24px;">DEMO GUIDE — THREE PERSPECTIVES</div>
+        <div class="guide-grid">
 
-        <div class="section-label">BACKED BY RESEARCH · 18 SURVEY RESPONSES</div>
+          <!-- Employee column -->
+          <div class="guide-col">
+            <div class="guide-col-header">
+              <span class="role-badge role-badge-emp" style="font-size:10px;">EMPLOYEE</span>
+              <div class="guide-col-title">Sarah's Return Journey</div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">1</div>
+              <div>
+                <div class="guide-step-title">Day 1 — Read What Changed</div>
+                <div class="guide-step-body">Open Employee view. Dashboard shows updates HR published about the team while you were away.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">2</div>
+              <div>
+                <div class="guide-step-title">Week 1 — Complete your checklist</div>
+                <div class="guide-step-body">Tick off onboarding tasks: meet your buddy, confirm IT access, join team meetings.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">3</div>
+              <div>
+                <div class="guide-step-title">Set Day 7 → submit a check-in</div>
+                <div class="guide-step-body">Weekly Check-in tab. Rate all 5 dimensions (try 2–3/5 to trigger an alert). Add a note.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">4</div>
+              <div>
+                <div class="guide-step-title">Read manager's message &amp; write diary</div>
+                <div class="guide-step-body">Resources tab shows the manager's message. Diary tab — pick a mood and write privately.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">5</div>
+              <div>
+                <div class="guide-step-title">Set Day 30/60/90 — track progress</div>
+                <div class="guide-step-body">Watch the confidence score grow as you submit more check-ins. Tasks shift across phases.</div>
+              </div>
+            </div>
+            <div class="guide-phase-row">
+              <div class="guide-phase">
+                <div class="guide-phase-label">Day 1–30</div>
+                <div class="guide-phase-body">Settle in, tick off checklist, weekly check-ins</div>
+              </div>
+              <div class="guide-phase">
+                <div class="guide-phase-label">Day 31–60</div>
+                <div class="guide-phase-body">Build momentum, take on first project</div>
+              </div>
+              <div class="guide-phase">
+                <div class="guide-phase-label">Day 61–90</div>
+                <div class="guide-phase-body">Full reintegration, 90-day review</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HR column -->
+          <div class="guide-col">
+            <div class="guide-col-header">
+              <span class="role-badge role-badge-hr" style="font-size:10px;">HR</span>
+              <div class="guide-col-title">HR Coordinator Journey</div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">1</div>
+              <div>
+                <div class="guide-step-title">Add a returner</div>
+                <div class="guide-step-body">HR → Add Returner. Fill in name, role, return date, assign manager &amp; buddy. Employee link is generated instantly.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">2</div>
+              <div>
+                <div class="guide-step-title">Publish What Changed digest</div>
+                <div class="guide-step-body">HR → Change Digest. Add updates about process, tools, team or policy changes since the employee left.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">3</div>
+              <div>
+                <div class="guide-step-title">Monitor the Overview dashboard</div>
+                <div class="guide-step-body">Watch for the red "Needs Attention" dot. Any check-in average below 3/5 triggers an alert with the employee's name.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">4</div>
+              <div>
+                <div class="guide-step-title">Send guidance to the manager</div>
+                <div class="guide-step-body">Overview → Send Manager Guidance. Select the employee and write an action item the manager should act on this week.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">5</div>
+              <div>
+                <div class="guide-step-title">Track confidence over time</div>
+                <div class="guide-step-body">HR → Confidence Tracker. Select an employee to see all 5 dimension scores across every check-in.</div>
+              </div>
+            </div>
+            <div class="guide-phase-row">
+              <div class="guide-phase">
+                <div class="guide-phase-label">Day 1–30</div>
+                <div class="guide-phase-body">Monitor first scores, send manager nudges</div>
+              </div>
+              <div class="guide-phase">
+                <div class="guide-phase-label">Day 31–60</div>
+                <div class="guide-phase-body">Review 30-day trend, update return plan</div>
+              </div>
+              <div class="guide-phase">
+                <div class="guide-phase-label">Day 61–90</div>
+                <div class="guide-phase-body">Prepare close-out report</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Manager column -->
+          <div class="guide-col">
+            <div class="guide-col-header">
+              <span class="role-badge role-badge-mgr" style="font-size:10px;">MANAGER</span>
+              <div class="guide-col-title">Manager Journey</div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">1</div>
+              <div>
+                <div class="guide-step-title">Read the Bias Nudge</div>
+                <div class="guide-step-body">Manager → Bias Nudge tab. Review the active alert about unconscious exclusion patterns. Dismiss once addressed.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">2</div>
+              <div>
+                <div class="guide-step-title">Check the confidence overview</div>
+                <div class="guide-step-body">Overview dashboard shows all 5 check-in dimensions from Sarah's latest submission. Low bars = action needed.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">3</div>
+              <div>
+                <div class="guide-step-title">Complete HR action items</div>
+                <div class="guide-step-body">Overview → This Week's Actions. HR sends specific tasks (e.g. "Schedule a 1:1"). Tick them off as done.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">4</div>
+              <div>
+                <div class="guide-step-title">Send Sarah a message</div>
+                <div class="guide-step-body">Overview → Send a Message. Write encouragement — it appears live in Sarah's Resources tab.</div>
+              </div>
+            </div>
+            <div class="guide-step">
+              <div class="guide-step-num">5</div>
+              <div>
+                <div class="guide-step-title">Add a task &amp; track the timeline</div>
+                <div class="guide-step-body">Timeline tab → Add a Task to Sarah's checklist. See the 30/60/90-day milestone timeline and your phase responsibilities.</div>
+              </div>
+            </div>
+            <div class="guide-phase-row">
+              <div class="guide-phase">
+                <div class="guide-phase-label">Day 1–30</div>
+                <div class="guide-phase-body">Weekly 1:1s, invite to all meetings</div>
+              </div>
+              <div class="guide-phase">
+                <div class="guide-phase-label">Day 31–60</div>
+                <div class="guide-phase-body">30-day review, offer first project</div>
+              </div>
+              <div class="guide-phase">
+                <div class="guide-phase-label">Day 61–90</div>
+                <div class="guide-phase-body">60-day review, high-visibility work</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /guide-grid -->
+
+        <!-- Research stats -->
+        <div class="section-label" style="margin-top:24px;">BACKED BY RESEARCH · 18 SURVEY RESPONSES</div>
         <div class="stat-row-4">
           <div class="survey-tile">
             <div class="survey-big">11<sup>/18</sup></div>
@@ -278,7 +367,7 @@ a.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #ccc; }
           </div>
         </div>
 
-        <div style="text-align:center;padding:20px 0 0;font-size:11px;color:var(--text-3);">
+        <div style="text-align:center;padding:20px 0 8px;font-size:11px;color:var(--text-3);">
           reentry · DECO7180 S2 2026 · Team Pochita · UQ
         </div>
 
@@ -305,24 +394,31 @@ a.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #ccc; }
 <script src="/static/data.js"></script>
 <script>
 const RETURN_DATE = '2026-04-17';
-let employees = [];
 
-// Load employee list for pickers
+// Load employee list for all pickers and sidebar links in one request
 fetch('/api/employees').then(r=>r.json()).then(data => {
-  employees = data;
   ['emp','mgr'].forEach(role => {
     const sel = document.getElementById('select-' + role);
-    if (!data.length) {
-      sel.innerHTML = '<option value="">No employees yet — add one in HR</option>';
-      return;
-    }
-    sel.innerHTML = data.map(e => `<option value="${e.id}">${e.name} · ${e.role}</option>`).join('');
+    sel.innerHTML = data.length
+      ? data.map(e => `<option value="${e.id}">${e.name} · ${e.role}</option>`).join('')
+      : '<option value="">No employees yet — add one in HR</option>';
   });
+  if (data[0]) {
+    document.getElementById('sb-emp').href = '/employee?id=' + data[0].id;
+    document.getElementById('sb-mgr').href = '/manager?employee_id=' + data[0].id;
+  }
 });
 
 function togglePicker(role) {
-  const el = document.getElementById('picker-' + role);
-  el.classList.toggle('open');
+  ['emp','mgr'].forEach(r => {
+    if (r !== role) document.getElementById('picker-' + r).classList.remove('open');
+  });
+  const picker = document.getElementById('picker-' + role);
+  picker.classList.toggle('open');
+  // Scroll the card into view so picker is always visible (important on mobile)
+  if (picker.classList.contains('open')) {
+    picker.closest('.role-card-new').scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
 }
 function goEmployee() {
   const id = document.getElementById('select-emp').value;
@@ -333,31 +429,23 @@ function goManager() {
   if (id) window.location.href = '/manager?employee_id=' + id;
 }
 
-// Also update sidebar links
-fetch('/api/employees').then(r=>r.json()).then(data => {
-  if (data[0]) {
-    document.getElementById('sb-emp').href = '/employee?id=' + data[0].id;
-    document.getElementById('sb-mgr').href = '/manager?employee_id=' + data[0].id;
-  }
-});
-
-// Demo date controls
 function parseLocal(str) { const [y,m,d]=str.split('-').map(Number); return new Date(y,m-1,d,12,0,0); }
 function toDateStr(date) { return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0'); }
 function calcDays(dateStr) {
-  const start = parseLocal(RETURN_DATE);
-  return Math.max(0, Math.floor((parseLocal(dateStr) - start) / 86400000));
+  return Math.max(0, Math.floor((parseLocal(dateStr) - parseLocal(RETURN_DATE)) / 86400000));
 }
 function updateDisplay(dateStr) { document.getElementById('day-num').textContent = calcDays(dateStr); }
 function onDateInput(val) {
   if (!val) return;
-  DB.setDemoDate(val); updateDisplay(val);
+  DB.setDemoDate(val);
+  updateDisplay(val);
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
 }
 function setDay(n, btn) {
   const str = toDateStr(new Date(parseLocal(RETURN_DATE).getTime() + n*86400000));
   document.getElementById('date-picker').value = str;
-  DB.setDemoDate(str); updateDisplay(str);
+  DB.setDemoDate(str);
+  updateDisplay(str);
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
 }
@@ -365,13 +453,9 @@ async function resetAll() {
   if (!confirm('Reset all demo data to defaults?')) return;
   await fetch('/api/reset', { method: 'POST' });
   DB.clearDemoDate();
-  const today = toDateStr(new Date());
-  document.getElementById('date-picker').value = today;
-  updateDisplay(today);
-  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-  // Reload employee pickers
   location.reload();
 }
+
 const cur = DB.getDemoDate();
 const curStr = toDateStr(cur);
 document.getElementById('date-picker').value = curStr;
