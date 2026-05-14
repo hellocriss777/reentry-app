@@ -3,26 +3,274 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>reentry — Demo Portal</title>
+<title>reentry — Showcase</title>
 <link rel="stylesheet" href="/static/style.css"/>
 <style>
+/* ── INDEX-ONLY STYLES ── */
 a.sidebar-item { text-decoration: none; }
 a.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #ccc; }
 
+/* Preset day buttons */
 .preset-btn {
   font-size:12px; font-weight:500; padding:6px 12px; border-radius:20px;
   border:1.5px solid var(--border-strong); background:transparent; color:var(--text-2);
   cursor:pointer; font-family:'Outfit',sans-serif; transition:all .15s;
 }
-.preset-btn:hover { border-color:var(--pink); color:var(--pink); }
+.preset-btn:hover  { border-color:var(--pink); color:var(--pink); }
 .preset-btn.active { background:var(--pink); border-color:var(--pink); color:white; }
 
-.stat-row-4 { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-@media (min-width:560px) { .stat-row-4 { grid-template-columns:repeat(4,1fr); } }
-.survey-tile { background:var(--card-raised); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 12px; text-align:center; box-shadow:var(--shadow); }
-.survey-big { font-family:'Instrument Serif',serif; font-size:28px; color:var(--pink); line-height:1; }
-.survey-big sup { font-size:13px; font-family:'Outfit',sans-serif; }
-.survey-lbl { font-size:11px; color:var(--text-2); margin-top:4px; line-height:1.4; }
+/* ── DEMO READY BAR ── */
+.demo-ready-bar {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  background: var(--dark); border-radius: var(--radius);
+  padding: 14px 18px; margin-top: 14px;
+}
+.btn-demo-ready {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #22a06b; color: white;
+  border: none; border-radius: var(--radius-sm);
+  padding: 10px 18px; font-size: 13px; font-weight: 700;
+  font-family: 'Outfit', sans-serif; cursor: pointer;
+  transition: background .15s; flex-shrink: 0;
+  letter-spacing: .02em;
+}
+.btn-demo-ready:hover   { background: #1a8a58; }
+.btn-demo-ready.loading { background: #555; pointer-events: none; }
+.btn-demo-ready.done    { background: #22a06b; }
+.btn-clear-all {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; color: rgba(255,255,255,.45);
+  border: 1.5px solid rgba(255,255,255,.12); border-radius: var(--radius-sm);
+  padding: 9px 14px; font-size: 12px; font-weight: 500;
+  font-family: 'Outfit', sans-serif; cursor: pointer; transition: all .15s;
+  flex-shrink: 0;
+}
+.btn-clear-all:hover { border-color: rgba(255,255,255,.3); color: rgba(255,255,255,.7); }
+.demo-bar-divider {
+  width: 1px; height: 28px; background: rgba(255,255,255,.1); flex-shrink: 0;
+}
+.demo-bar-day {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px; color: var(--pink); line-height: 1; white-space: nowrap;
+}
+.demo-bar-day-label { font-size: 10px; color: rgba(255,255,255,.3); margin-top: 1px; }
+.demo-day-group { flex-shrink: 0; }
+.demo-presets-group { flex: 1; min-width: 0; }
+.demo-presets-label {
+  font-size: 9px; font-weight: 700; letter-spacing: .1em;
+  color: rgba(255,255,255,.25); text-transform: uppercase; margin-bottom: 6px;
+}
+.demo-presets-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.preset-btn-dark {
+  font-size:11px; font-weight:600; padding:5px 11px; border-radius:16px;
+  border:1.5px solid rgba(255,255,255,.15); background:transparent;
+  color:rgba(255,255,255,.5);
+  cursor:pointer; font-family:'Outfit',sans-serif; transition:all .15s;
+}
+.preset-btn-dark:hover  { border-color:var(--pink); color:var(--pink); }
+.preset-btn-dark.active { background:var(--pink); border-color:var(--pink); color:white; }
+
+/* ── RESEARCH SECTION ── */
+.research-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+@media (min-width: 680px) {
+  .research-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+.research-chart-card {
+  background: var(--card-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 14px 12px;
+  box-shadow: var(--shadow);
+}
+.research-chart-title {
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  color: var(--text-3); text-transform: uppercase; margin-bottom: 10px;
+}
+.research-stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 0;
+}
+@media (min-width: 680px) {
+  .research-stat-row { grid-template-columns: repeat(4, 1fr); }
+}
+.r-stat {
+  background: var(--card-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px 12px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.r-stat-big {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; color: var(--pink); line-height: 1;
+}
+.r-stat-big sup { font-size: 13px; font-family: 'Outfit', sans-serif; }
+.r-stat-lbl { font-size: 11px; color: var(--text-2); margin-top: 5px; line-height: 1.4; }
+
+/* ── ROLE CARDS ── */
+.role-grid-new {
+  display: grid; grid-template-columns: 1fr; gap: 12px;
+}
+@media (min-width: 600px) {
+  .role-grid-new { grid-template-columns: repeat(3, 1fr); }
+}
+.role-card-new {
+  background: var(--card-raised);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+  cursor: pointer;
+  transition: transform .18s, box-shadow .18s, border-color .18s;
+  box-shadow: var(--shadow); position: relative; overflow: hidden;
+  text-decoration: none; display: block;
+}
+.role-card-new:hover {
+  transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--pink);
+}
+.role-card-top {
+  display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;
+}
+.role-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.role-icon-emp { background: var(--pink-soft); }
+.role-icon-hr  { background: rgba(44,43,41,.08); }
+.role-icon-mgr { background: linear-gradient(135deg, var(--pink-soft), rgba(44,43,41,.08)); }
+.role-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: .1em;
+  padding: 3px 8px; border-radius: 10px; text-transform: uppercase;
+}
+.role-badge-emp { background: var(--pink-soft); color: var(--pink); }
+.role-badge-hr  { background: var(--bg-2); color: var(--text-3); }
+.role-badge-mgr { background: linear-gradient(90deg,var(--pink-soft),var(--bg-2)); color: var(--dark); }
+.student-label {
+  font-size: 9px; font-weight: 700; letter-spacing: .06em;
+  color: rgba(255,255,255,.9); background: var(--dark);
+  padding: 2px 8px; border-radius: 6px;
+  display: inline-block; margin-bottom: 8px;
+}
+.role-card-name { font-family: 'Playfair Display',serif; font-size: 18px; color: var(--text); margin-bottom: 3px; }
+.role-card-sub  { font-size: 12px; color: var(--text-2); line-height: 1.45; margin-bottom: 10px; }
+.role-card-features { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.role-card-features li {
+  font-size: 11px; color: var(--text-3);
+  display: flex; align-items: center; gap: 6px;
+}
+.role-card-features li::before {
+  content: ''; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--pink); flex-shrink: 0;
+}
+.role-card-features li.highlight { color: var(--pink); font-weight: 600; }
+.role-card-features li.highlight::before { background: var(--pink); }
+.role-picker-inline {
+  margin-top: 12px; padding-top: 10px;
+  border-top: 1px solid var(--border); display: none;
+}
+.role-picker-inline.open { display: block; }
+.role-picker-row { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+.picker-sel {
+  flex: 1; background: var(--bg-2);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-xs);
+  padding: 8px 10px; font-size: 13px; font-family: 'Outfit', sans-serif; color: var(--text);
+}
+.picker-go-btn {
+  padding: 8px 16px; background: var(--pink); color: white;
+  border: none; border-radius: var(--radius-xs);
+  font-size: 13px; font-weight: 600; font-family: 'Outfit', sans-serif; cursor: pointer;
+}
+.picker-go-btn:hover { background: #c0486f; }
+
+/* ── DEMO GUIDE ── */
+.guide-grid {
+  display: grid; grid-template-columns: 1fr; gap: 14px;
+}
+@media (min-width: 700px) {
+  .guide-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.guide-col {
+  background: var(--card-raised); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow);
+}
+.guide-col-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.guide-col-title { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; min-width: 0; }
+.guide-timing {
+  font-size: 10px; font-weight: 700; color: var(--pink);
+  background: var(--pink-soft); padding: 2px 8px; border-radius: 10px;
+  white-space: nowrap;
+}
+.guide-step {
+  display: flex; gap: 9px; padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.guide-step:last-of-type { border-bottom: none; }
+.guide-step-num {
+  width: 19px; height: 19px; border-radius: 50%;
+  background: var(--dark); color: white;
+  font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.guide-step-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.guide-step-body  { font-size: 11px; color: var(--text-2); line-height: 1.45; }
+.guide-phase-row {
+  display: flex; gap: 5px; margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.guide-phase {
+  flex: 1; min-width: 56px; background: var(--bg-2);
+  border-radius: var(--radius-sm); padding: 7px 7px 5px; text-align: center;
+}
+.guide-phase-label { font-size: 9px; font-weight: 700; letter-spacing: .07em; color: var(--pink); text-transform: uppercase; margin-bottom: 2px; }
+.guide-phase-body  { font-size: 10px; color: var(--text-2); line-height: 1.4; }
+
+/* ── FEATURE MAP (collapsible) ── */
+.feature-map-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--card-raised); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 16px;
+  cursor: pointer; box-shadow: var(--shadow); margin-top: 8px;
+  transition: border-color .15s;
+}
+.feature-map-toggle:hover { border-color: var(--border-strong); }
+.feature-map-toggle-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.feature-map-toggle-sub { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.feature-map-chevron {
+  transition: transform .2s; color: var(--text-3);
+  flex-shrink: 0; margin-left: 12px;
+}
+.feature-map-toggle.open .feature-map-chevron { transform: rotate(180deg); }
+.feature-map-body { display: none; margin-top: 8px; }
+.feature-map-toggle.open + .feature-map-body { display: block; }
+.fmap-row {
+  display: flex; gap: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--card-raised);
+}
+.fmap-row:first-child { border-radius: var(--radius-sm) var(--radius-sm) 0 0; overflow: hidden; }
+.fmap-row:last-child  { border-bottom: none; border-radius: 0 0 var(--radius-sm) var(--radius-sm); overflow: hidden; }
+.fmap-row.header { background: var(--dark); }
+.fmap-finding { flex: 1; font-size: 12px; color: var(--text-2); padding: 10px 14px; border-right: 1px solid var(--border); line-height: 1.4; }
+.fmap-feature { flex: 1; font-size: 12px; color: var(--text); padding: 10px 14px; font-weight: 500; line-height: 1.4; }
+.fmap-row.header .fmap-finding { color: rgba(255,255,255,.4); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.fmap-row.header .fmap-feature { color: rgba(255,255,255,.4); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; border-right: none; }
+.fmap-row.header .fmap-finding { border-right: 1px solid rgba(255,255,255,.08); }
+.fmap-num {
+  width: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--pink); border-right: 1px solid var(--border);
+}
+.fmap-row.header .fmap-num { color: rgba(255,255,255,.2); border-right: 1px solid rgba(255,255,255,.08); }
 </style>
 </head>
 <body>
@@ -30,7 +278,7 @@ a.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #ccc; }
 <div class="app-shell">
   <aside class="sidebar">
     <div class="sidebar-logo">re<span>entry</span></div>
-    <div class="sidebar-view-label">Demo Portal</div>
+    <div class="sidebar-view-label">Showcase Portal</div>
     <nav class="sidebar-nav">
       <button class="sidebar-item active">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
@@ -39,15 +287,15 @@ a.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #ccc; }
     </nav>
     <div class="sidebar-view-label" style="margin-top:24px;">OPEN A VIEW</div>
     <nav class="sidebar-nav">
-      <a class="sidebar-item" href="/employee" id="sb-emp">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-        Employee
-      </a>
       <a class="sidebar-item" href="/hr">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
         HR Dashboard
       </a>
-      <a class="sidebar-item" href="/manager" id="sb-mgr">
+      <a class="sidebar-item" href="#" id="sb-emp">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        Employee
+      </a>
+      <a class="sidebar-item" href="#" id="sb-mgr">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
         Manager
       </a>
@@ -56,326 +304,382 @@ a.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #ccc; }
 
   <main class="main-content">
     <div class="page">
-      <div class="section active" id="sec-home">
 
-        <!-- Hero -->
-        <div class="index-hero">
-          <div class="index-hero-eyebrow">DECO7180 · A03 · UQ · TEAM POCHITA</div>
-          <h1>re<span>entry</span></h1>
-          <div class="index-hero-sub">A structured return-to-work platform for women coming back from parental or medical leave — three coordinated views, one shared database.</div>
-          <div class="index-hero-tags">
-            <span class="index-tag">3 coordinated views</span>
-            <span class="index-tag">Live database</span>
-            <span class="index-tag">Confidence tracking</span>
-            <span class="index-tag">Bias nudges</span>
-            <span class="index-tag">Private diary</span>
+      <!-- ── HERO ── -->
+      <div class="index-hero">
+        <div class="index-hero-eyebrow">DECO7180 · A03 · UQ · TEAM POCHITA</div>
+        <h1>re<span>entry</span></h1>
+        <div class="index-hero-sub">A structured return-to-work platform for women coming back from parental or medical leave — three coordinated views, one shared live database.</div>
+        <div class="index-hero-tags">
+          <span class="index-tag">Employee · HR · Manager</span>
+          <span class="index-tag">Live database</span>
+          <span class="index-tag">Confidence tracking</span>
+          <span class="index-tag">Bias nudges</span>
+          <span class="index-tag">30 / 60 / 90 days</span>
+        </div>
+      </div>
+
+      <!-- ── DEMO READY BAR ── -->
+      <div class="demo-ready-bar">
+        <div class="demo-day-group">
+          <div class="demo-bar-day" id="day-num">—</div>
+          <div class="demo-bar-day-label">days since return</div>
+        </div>
+        <div class="demo-bar-divider"></div>
+        <button class="btn-demo-ready" id="btn-demo-ready" onclick="loadDemoState()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Load Demo State
+        </button>
+        <button class="btn-clear-all" onclick="clearAll()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          Clear All Data
+        </button>
+        <div class="demo-bar-divider"></div>
+        <div class="demo-presets-group">
+          <div class="demo-presets-label">Set demo day</div>
+          <div class="demo-presets-row">
+            <button class="preset-btn-dark" onclick="setDay(1,this)">Day 1</button>
+            <button class="preset-btn-dark" onclick="setDay(7,this)">Day 7</button>
+            <button class="preset-btn-dark" onclick="setDay(14,this)">Day 14</button>
+            <button class="preset-btn-dark" onclick="setDay(30,this)">Day 30</button>
+            <button class="preset-btn-dark" onclick="setDay(60,this)">Day 60</button>
+            <button class="preset-btn-dark" onclick="setDay(90,this)">Day 90</button>
           </div>
         </div>
+      </div>
 
-        <!-- Demo controls — compact horizontal bar -->
-        <div class="demo-ctrl-compact" style="margin-top:16px;">
-          <div style="flex-shrink:0;">
-            <div class="demo-day-display" id="day-num">—</div>
-            <div class="demo-day-label">days since return</div>
-          </div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-3);margin-bottom:7px;">SET DEMO DATE</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <button class="preset-btn" onclick="setDay(1,this)">Day 1</button>
-              <button class="preset-btn" onclick="setDay(7,this)">Day 7</button>
-              <button class="preset-btn" onclick="setDay(14,this)">Day 14</button>
-              <button class="preset-btn" onclick="setDay(30,this)">Day 30</button>
-              <button class="preset-btn" onclick="setDay(60,this)">Day 60</button>
-              <button class="preset-btn" onclick="setDay(90,this)">Day 90</button>
-            </div>
-          </div>
-          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-            <input type="date" class="form-input" id="date-picker" oninput="onDateInput(this.value)" style="font-size:12px;padding:7px 10px;width:160px;"/>
-            <button onclick="resetAll()" style="font-size:11px;color:var(--text-3);cursor:pointer;background:none;border:none;font-family:inherit;padding:0;white-space:nowrap;" onmouseover="this.style.color='var(--pink)'" onmouseout="this.style.color='var(--text-3)'">↺ Reset all demo data</button>
-          </div>
+      <!-- ── THE PROBLEM ── -->
+      <div class="section-label" style="margin-top:24px;">THE PROBLEM · 18 SURVEY RESPONSES ACROSS TWO USER GROUPS</div>
+      <div class="research-grid">
+
+        <!-- Chart 1: First week feelings -->
+        <div class="research-chart-card">
+          <div class="research-chart-title">First week back — how women felt</div>
+          <div class="chart-wrap" style="height:110px;"><canvas id="chart-feelings"></canvas></div>
         </div>
 
-        <!-- Role cards -->
-        <div class="section-label" style="margin-top:20px;">OPEN A VIEW</div>
-        <div class="role-grid-new">
-
-          <!-- HR — direct link, no picker needed -->
-          <a class="role-card-new" href="/hr">
-            <div class="role-card-top">
-              <div class="role-icon role-icon-hr">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--dark)"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
-              </div>
-              <span class="role-badge role-badge-hr">HR</span>
-            </div>
-            <div class="role-card-name">HR Dashboard</div>
-            <div class="role-card-sub">Monitor returners &amp; publish updates</div>
-            <ul class="role-card-features">
-              <li>Attention alerts &amp; confidence tracker</li>
-              <li>Add / configure returners</li>
-              <li>Publish What Changed digest</li>
-              <li>Send guidance to managers</li>
-            </ul>
-          </a>
-
-          <!-- Employee — needs picker -->
-          <div class="role-card-new" onclick="togglePicker('emp')">
-            <div class="role-card-top">
-              <div class="role-icon role-icon-emp">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--pink)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-              </div>
-              <span class="role-badge role-badge-emp">EMPLOYEE</span>
-            </div>
-            <div class="role-card-name">Returning Employee</div>
-            <div class="role-card-sub">Dashboard, check-in &amp; private diary</div>
-            <ul class="role-card-features">
-              <li>Confidence score &amp; weekly check-in</li>
-              <li>Milestone checklist</li>
-              <li>Private diary with mood tracking</li>
-              <li>Resources, buddy &amp; manager messages</li>
-            </ul>
-            <div class="role-picker-inline" id="picker-emp" onclick="event.stopPropagation()">
-              <div style="font-size:11px;color:var(--text-3);margin-bottom:6px;">Select employee</div>
-              <div class="role-picker-row">
-                <select class="picker-sel" id="select-emp"><option value="">Loading…</option></select>
-                <button class="picker-go-btn" onclick="goEmployee()">Go →</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Manager — needs picker -->
-          <div class="role-card-new" onclick="togglePicker('mgr')">
-            <div class="role-card-top">
-              <div class="role-icon role-icon-mgr">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--dark)"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
-              </div>
-              <span class="role-badge role-badge-mgr">MANAGER</span>
-            </div>
-            <div class="role-card-name">Manager View</div>
-            <div class="role-card-sub">Actions, feedback &amp; bias check</div>
-            <ul class="role-card-features">
-              <li>Confidence overview · all 5 dimensions</li>
-              <li>Bias nudge alerts</li>
-              <li>Send a message to the employee</li>
-              <li>Add tasks to the checklist</li>
-            </ul>
-            <div class="role-picker-inline" id="picker-mgr" onclick="event.stopPropagation()">
-              <div style="font-size:11px;color:var(--text-3);margin-bottom:6px;">Select employee to manage</div>
-              <div class="role-picker-row">
-                <select class="picker-sel" id="select-mgr"><option value="">Loading…</option></select>
-                <button class="picker-go-btn" onclick="goManager()">Go →</button>
-              </div>
-            </div>
-          </div>
-
-        </div><!-- /role-grid-new -->
-
-        <!-- Three-role demo guide -->
-        <div class="section-label" style="margin-top:24px;">DEMO GUIDE — THREE PERSPECTIVES</div>
-        <div class="guide-grid">
-
-          <!-- Employee column -->
-          <div class="guide-col">
-            <div class="guide-col-header">
-              <span class="role-badge role-badge-emp" style="font-size:10px;">EMPLOYEE</span>
-              <div class="guide-col-title">Sarah's Return Journey</div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">1</div>
-              <div>
-                <div class="guide-step-title">Day 1 — Read What Changed</div>
-                <div class="guide-step-body">Open Employee view. Dashboard shows updates HR published about the team while you were away.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">2</div>
-              <div>
-                <div class="guide-step-title">Week 1 — Complete your checklist</div>
-                <div class="guide-step-body">Tick off onboarding tasks: meet your buddy, confirm IT access, join team meetings.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">3</div>
-              <div>
-                <div class="guide-step-title">Set Day 7 → submit a check-in</div>
-                <div class="guide-step-body">Weekly Check-in tab. Rate all 5 dimensions (try 2–3/5 to trigger an alert). Add a note.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">4</div>
-              <div>
-                <div class="guide-step-title">Read manager's message &amp; write diary</div>
-                <div class="guide-step-body">Resources tab shows the manager's message. Diary tab — pick a mood and write privately.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">5</div>
-              <div>
-                <div class="guide-step-title">Set Day 30/60/90 — track progress</div>
-                <div class="guide-step-body">Watch the confidence score grow as you submit more check-ins. Tasks shift across phases.</div>
-              </div>
-            </div>
-            <div class="guide-phase-row">
-              <div class="guide-phase">
-                <div class="guide-phase-label">Day 1–30</div>
-                <div class="guide-phase-body">Settle in, tick off checklist, weekly check-ins</div>
-              </div>
-              <div class="guide-phase">
-                <div class="guide-phase-label">Day 31–60</div>
-                <div class="guide-phase-body">Build momentum, take on first project</div>
-              </div>
-              <div class="guide-phase">
-                <div class="guide-phase-label">Day 61–90</div>
-                <div class="guide-phase-body">Full reintegration, 90-day review</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- HR column -->
-          <div class="guide-col">
-            <div class="guide-col-header">
-              <span class="role-badge role-badge-hr" style="font-size:10px;">HR</span>
-              <div class="guide-col-title">HR Coordinator Journey</div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">1</div>
-              <div>
-                <div class="guide-step-title">Add a returner</div>
-                <div class="guide-step-body">HR → Add Returner. Fill in name, role, return date, assign manager &amp; buddy. Employee link is generated instantly.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">2</div>
-              <div>
-                <div class="guide-step-title">Publish What Changed digest</div>
-                <div class="guide-step-body">HR → Change Digest. Add updates about process, tools, team or policy changes since the employee left.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">3</div>
-              <div>
-                <div class="guide-step-title">Monitor the Overview dashboard</div>
-                <div class="guide-step-body">Watch for the red "Needs Attention" dot. Any check-in average below 3/5 triggers an alert with the employee's name.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">4</div>
-              <div>
-                <div class="guide-step-title">Send guidance to the manager</div>
-                <div class="guide-step-body">Overview → Send Manager Guidance. Select the employee and write an action item the manager should act on this week.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">5</div>
-              <div>
-                <div class="guide-step-title">Track confidence over time</div>
-                <div class="guide-step-body">HR → Confidence Tracker. Select an employee to see all 5 dimension scores across every check-in.</div>
-              </div>
-            </div>
-            <div class="guide-phase-row">
-              <div class="guide-phase">
-                <div class="guide-phase-label">Day 1–30</div>
-                <div class="guide-phase-body">Monitor first scores, send manager nudges</div>
-              </div>
-              <div class="guide-phase">
-                <div class="guide-phase-label">Day 31–60</div>
-                <div class="guide-phase-body">Review 30-day trend, update return plan</div>
-              </div>
-              <div class="guide-phase">
-                <div class="guide-phase-label">Day 61–90</div>
-                <div class="guide-phase-body">Prepare close-out report</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Manager column -->
-          <div class="guide-col">
-            <div class="guide-col-header">
-              <span class="role-badge role-badge-mgr" style="font-size:10px;">MANAGER</span>
-              <div class="guide-col-title">Manager Journey</div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">1</div>
-              <div>
-                <div class="guide-step-title">Read the Bias Nudge</div>
-                <div class="guide-step-body">Manager → Bias Nudge tab. Review the active alert about unconscious exclusion patterns. Dismiss once addressed.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">2</div>
-              <div>
-                <div class="guide-step-title">Check the confidence overview</div>
-                <div class="guide-step-body">Overview dashboard shows all 5 check-in dimensions from Sarah's latest submission. Low bars = action needed.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">3</div>
-              <div>
-                <div class="guide-step-title">Complete HR action items</div>
-                <div class="guide-step-body">Overview → This Week's Actions. HR sends specific tasks (e.g. "Schedule a 1:1"). Tick them off as done.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">4</div>
-              <div>
-                <div class="guide-step-title">Send Sarah a message</div>
-                <div class="guide-step-body">Overview → Send a Message. Write encouragement — it appears live in Sarah's Resources tab.</div>
-              </div>
-            </div>
-            <div class="guide-step">
-              <div class="guide-step-num">5</div>
-              <div>
-                <div class="guide-step-title">Add a task &amp; track the timeline</div>
-                <div class="guide-step-body">Timeline tab → Add a Task to Sarah's checklist. See the 30/60/90-day milestone timeline and your phase responsibilities.</div>
-              </div>
-            </div>
-            <div class="guide-phase-row">
-              <div class="guide-phase">
-                <div class="guide-phase-label">Day 1–30</div>
-                <div class="guide-phase-body">Weekly 1:1s, invite to all meetings</div>
-              </div>
-              <div class="guide-phase">
-                <div class="guide-phase-label">Day 31–60</div>
-                <div class="guide-phase-body">30-day review, offer first project</div>
-              </div>
-              <div class="guide-phase">
-                <div class="guide-phase-label">Day 61–90</div>
-                <div class="guide-phase-body">60-day review, high-visibility work</div>
-              </div>
-            </div>
-          </div>
-
-        </div><!-- /guide-grid -->
-
-        <!-- Research stats -->
-        <div class="section-label" style="margin-top:24px;">BACKED BY RESEARCH · 18 SURVEY RESPONSES</div>
-        <div class="stat-row-4">
-          <div class="survey-tile">
-            <div class="survey-big">11<sup>/18</sup></div>
-            <div class="survey-lbl">felt anxiety about being judged in week one back</div>
-          </div>
-          <div class="survey-tile">
-            <div class="survey-big">5<sup>/8</sup></div>
-            <div class="survey-lbl">received zero structured support on return</div>
-          </div>
-          <div class="survey-tile">
-            <div class="survey-big">3.38<sup>/5</sup></div>
-            <div class="survey-lbl">self-exclusion score — women hold themselves back first</div>
-          </div>
-          <div class="survey-tile">
-            <div class="survey-big">7<sup>/8</sup></div>
-            <div class="survey-lbl">would use a digital return-to-work platform</div>
-          </div>
+        <!-- Chart 2: Support received -->
+        <div class="research-chart-card">
+          <div class="research-chart-title">Support received on return</div>
+          <div class="chart-wrap" style="height:110px;"><canvas id="chart-support"></canvas></div>
         </div>
 
-        <div style="text-align:center;padding:20px 0 8px;font-size:11px;color:var(--text-3);">
-          reentry · DECO7180 S2 2026 · Team Pochita · UQ
+        <!-- Chart 3: Manager readiness -->
+        <div class="research-chart-card" style="grid-column: span 2;">
+          <div class="research-chart-title">Manager readiness gap</div>
+          <div class="chart-wrap" style="height:110px;"><canvas id="chart-managers"></canvas></div>
         </div>
+        <style>@media(min-width:680px){.research-grid>.research-chart-card:nth-child(3){grid-column:span 1;}}</style>
 
       </div>
+
+      <!-- Stat tiles row -->
+      <div class="research-stat-row" style="margin-top:10px;">
+        <div class="r-stat">
+          <div class="r-stat-big">11<sup>/18</sup></div>
+          <div class="r-stat-lbl">felt anxiety about being judged in week one</div>
+        </div>
+        <div class="r-stat">
+          <div class="r-stat-big">5<sup>/8</sup></div>
+          <div class="r-stat-lbl">received zero structured support on return</div>
+        </div>
+        <div class="r-stat">
+          <div class="r-stat-big">3.38<sup>/5</sup></div>
+          <div class="r-stat-lbl">self-exclusion score — women hold themselves back first</div>
+        </div>
+        <div class="r-stat">
+          <div class="r-stat-big">7<sup>/8</sup></div>
+          <div class="r-stat-lbl">would use a digital return-to-work platform</div>
+        </div>
+      </div>
+
+      <!-- ── OPEN A VIEW ── -->
+      <div class="section-label" style="margin-top:28px;">THREE PERSPECTIVES · OPEN A VIEW</div>
+      <div class="role-grid-new">
+
+        <!-- HR — Student A -->
+        <a class="role-card-new" href="/hr">
+          <div class="role-card-top">
+            <div class="role-icon role-icon-hr">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--dark)"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+            </div>
+            <span class="role-badge role-badge-hr">HR</span>
+          </div>
+          <div class="student-label">Student A</div>
+          <div class="role-card-name">HR Dashboard</div>
+          <div class="role-card-sub">Set up Sarah's return, publish what changed, monitor confidence</div>
+          <ul class="role-card-features">
+            <li class="highlight">Add returner &amp; assign buddy</li>
+            <li class="highlight">Publish What Changed digest</li>
+            <li>Attention alerts &amp; confidence tracker</li>
+            <li>Send guidance to manager</li>
+          </ul>
+        </a>
+
+        <!-- Employee — Student B -->
+        <div class="role-card-new" onclick="togglePicker('emp')">
+          <div class="role-card-top">
+            <div class="role-icon role-icon-emp">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--pink)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            </div>
+            <span class="role-badge role-badge-emp">EMPLOYEE</span>
+          </div>
+          <div class="student-label">Student B</div>
+          <div class="role-card-name">Sarah Chen</div>
+          <div class="role-card-sub">Returning Senior Designer — her experience on day one</div>
+          <ul class="role-card-features">
+            <li class="highlight">Dashboard &amp; What Changed card</li>
+            <li class="highlight">Weekly check-in (submit low scores)</li>
+            <li>Milestone checklist &amp; buddy</li>
+            <li>Manager messages &amp; private diary</li>
+          </ul>
+          <div class="role-picker-inline" id="picker-emp" onclick="event.stopPropagation()">
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:6px;">Select employee</div>
+            <div class="role-picker-row">
+              <select class="picker-sel" id="select-emp"><option value="">Loading…</option></select>
+              <button class="picker-go-btn" onclick="goEmployee()">Go →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manager — Student C -->
+        <div class="role-card-new" onclick="togglePicker('mgr')">
+          <div class="role-card-top">
+            <div class="role-icon role-icon-mgr">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--dark)"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+            </div>
+            <span class="role-badge role-badge-mgr">MANAGER</span>
+          </div>
+          <div class="student-label">Student C</div>
+          <div class="role-card-name">Tom Walters</div>
+          <div class="role-card-sub">Sarah's manager — responds to the confidence alert</div>
+          <ul class="role-card-features">
+            <li class="highlight">See confidence drop across 5 dimensions</li>
+            <li class="highlight">Bias nudge &amp; conversation scripts</li>
+            <li>Send message to Sarah</li>
+            <li>Add tasks &amp; 30/60/90 timeline</li>
+          </ul>
+          <div class="role-picker-inline" id="picker-mgr" onclick="event.stopPropagation()">
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:6px;">Select employee to manage</div>
+            <div class="role-picker-row">
+              <select class="picker-sel" id="select-mgr"><option value="">Loading…</option></select>
+              <button class="picker-go-btn" onclick="goManager()">Go →</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /role-grid-new -->
+
+      <!-- ── 10-MIN DEMO FLOW ── -->
+      <div class="section-label" style="margin-top:28px;">10-MINUTE DEMO FLOW · THREE PEOPLE, THREE PERSPECTIVES</div>
+      <div class="guide-grid">
+
+        <!-- Student A — HR -->
+        <div class="guide-col">
+          <div class="guide-col-header">
+            <span class="role-badge role-badge-hr">HR · Student A</span>
+            <div class="guide-col-title">Set the stage</div>
+            <span class="guide-timing">0–3 min</span>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">1</div>
+            <div>
+              <div class="guide-step-title">Open index, anchor the problem</div>
+              <div class="guide-step-body">Point to the research charts. "5/8 women got no support. Managers score 2.94/5 confidence. We built this to fill that gap."</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">2</div>
+            <div>
+              <div class="guide-step-title">Hit Load Demo State</div>
+              <div class="guide-step-body">One click resets the database and sets Day 7. Everything is pre-seeded and ready.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">3</div>
+            <div>
+              <div class="guide-step-title">HR dashboard — 3 stages at a glance</div>
+              <div class="guide-step-body">Three returners visible at once: Sarah (Day 7, 🔴 alert), Maya (Day 31, improving), Jess (Day 60, thriving). "The platform tracks the whole 90-day journey simultaneously." Click Sarah's alert to surface the confidence drop.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">4</div>
+            <div>
+              <div class="guide-step-title">Add Returner + What Changed</div>
+              <div class="guide-step-body">Briefly demo the intake form — name, role, buddy, manager, return date. Then publish a What Changed update (standup moved, new teammates). Sarah sees it live on her dashboard.</div>
+            </div>
+          </div>
+          <div class="guide-phase-row">
+            <div class="guide-phase"><div class="guide-phase-label">Day 1–30</div><div class="guide-phase-body">Monitor first scores, send nudges</div></div>
+            <div class="guide-phase"><div class="guide-phase-label">Day 31–60</div><div class="guide-phase-body">Review 30-day trend</div></div>
+            <div class="guide-phase"><div class="guide-phase-label">Day 61–90</div><div class="guide-phase-body">Close-out report</div></div>
+          </div>
+        </div>
+
+        <!-- Student B — Employee -->
+        <div class="guide-col">
+          <div class="guide-col-header">
+            <span class="role-badge role-badge-emp">Employee · Student B</span>
+            <div class="guide-col-title">Sarah's experience</div>
+            <span class="guide-timing">3–7 min</span>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">1</div>
+            <div>
+              <div class="guide-step-title">Dashboard — Day 7</div>
+              <div class="guide-step-body">"Welcome back, Sarah." Show the What Changed card HR just published. She sees it immediately.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">2</div>
+            <div>
+              <div class="guide-step-title">Complete the checklist</div>
+              <div class="guide-step-body">Tick off buddy meeting and IT setup. Progress bar updates in real time.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">3</div>
+            <div>
+              <div class="guide-step-title">Submit a check-in with low scores</div>
+              <div class="guide-step-body">Go to Weekly Check-in. Rate all 5 dimensions 2–3/5. Add a note. Hit Save — this triggers an alert for HR and Tom.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">4</div>
+            <div>
+              <div class="guide-step-title">Resources tab — see Tom's message</div>
+              <div class="guide-step-body">After the manager sends a message (step in Student C's flow), come back here to show it arrived live.</div>
+            </div>
+          </div>
+          <div class="guide-phase-row">
+            <div class="guide-phase"><div class="guide-phase-label">Day 1–30</div><div class="guide-phase-body">Settle in, weekly check-ins</div></div>
+            <div class="guide-phase"><div class="guide-phase-label">Day 31–60</div><div class="guide-phase-body">Build momentum</div></div>
+            <div class="guide-phase"><div class="guide-phase-label">Day 61–90</div><div class="guide-phase-body">Full reintegration</div></div>
+          </div>
+        </div>
+
+        <!-- Student C — Manager -->
+        <div class="guide-col">
+          <div class="guide-col-header">
+            <span class="role-badge role-badge-mgr">Manager · Student C</span>
+            <div class="guide-col-title">Tom responds</div>
+            <span class="guide-timing">7–10 min</span>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">1</div>
+            <div>
+              <div class="guide-step-title">Overview — confidence bars are low</div>
+              <div class="guide-step-body">All 5 dimensions show from Sarah's just-submitted check-in. "The system surfaced this immediately — no chasing."</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">2</div>
+            <div>
+              <div class="guide-step-title">Bias Nudge tab</div>
+              <div class="guide-step-body">Read the active nudge: "Sarah hasn't been invited to planning meetings." Expand a conversation script. Dismiss as addressed.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">3</div>
+            <div>
+              <div class="guide-step-title">Send a message to Sarah</div>
+              <div class="guide-step-body">Type encouragement. Hit Send — it appears in Sarah's Resources tab live. Student B can show it arriving.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">4</div>
+            <div>
+              <div class="guide-step-title">Timeline — add a task</div>
+              <div class="guide-step-body">Add a task to Sarah's checklist from the Timeline tab. Show the 30/60/90 phase breakdown. Wrap up: back to index, point to the feature-research map.</div>
+            </div>
+          </div>
+          <div class="guide-phase-row">
+            <div class="guide-phase"><div class="guide-phase-label">Day 1–30</div><div class="guide-phase-body">Weekly 1:1s, invite to all meetings</div></div>
+            <div class="guide-phase"><div class="guide-phase-label">Day 31–60</div><div class="guide-phase-body">30-day review, first project</div></div>
+            <div class="guide-phase"><div class="guide-phase-label">Day 61–90</div><div class="guide-phase-body">High-visibility work</div></div>
+          </div>
+        </div>
+
+      </div><!-- /guide-grid -->
+
+      <!-- ── FEATURE-RESEARCH MAP ── -->
+      <div class="section-label" style="margin-top:28px;">EVERY FEATURE IS DATA-DRIVEN</div>
+      <div class="feature-map-toggle" onclick="toggleFmap(this)">
+        <div>
+          <div class="feature-map-toggle-title">Survey finding → Platform feature map</div>
+          <div class="feature-map-toggle-sub">10 findings, 10 features — tap to expand</div>
+        </div>
+        <svg class="feature-map-chevron" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+      </div>
+      <div class="feature-map-body">
+        <div style="border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow);">
+          <div class="fmap-row header">
+            <div class="fmap-num">#</div>
+            <div class="fmap-finding">Survey finding</div>
+            <div class="fmap-feature" style="border-right:none;">Platform feature</div>
+          </div>
+          <div class="fmap-row">
+            <div class="fmap-num">1</div>
+            <div class="fmap-finding">Women don't know what changed while away (top support need)</div>
+            <div class="fmap-feature">What Changed digest — HR publishes, Employee sees on dashboard</div>
+          </div>
+          <div class="fmap-row">
+            <div class="fmap-num">2</div>
+            <div class="fmap-finding">Self-exclusion score 3.38/5 — women hold themselves back first</div>
+            <div class="fmap-feature">Weekly 5-dimension confidence check-in</div>
+          </div>
+          <div class="fmap-row">
+            <div class="fmap-num">3</div>
+            <div class="fmap-finding">5/8 confidence not fully recovered — needs ongoing visibility</div>
+            <div class="fmap-feature">Confidence tracker visible to HR across all employees</div>
+          </div>
+          <div class="fmap-row">
+            <div class="fmap-num">4</div>
+            <div class="fmap-finding">Buddy/mentor was the #1 requested support mechanism</div>
+            <div class="fmap-feature">Buddy assignment system with contact shortcut</div>
+          </div>
+          <div class="fmap-row">
+            <div class="fmap-num">5</div>
+            <div class="fmap-finding">4/8 took 2–3 months to catch up; support can't stop at week 1</div>
+            <div class="fmap-feature">Structured 30/60/90 day timeline with phase-specific actions</div>
+          </div>
+          <div class="fmap-row">
+            <div class="fmap-num">6</div>
+            <div class="fmap-finding">Managers score 2.94/5 on confidence supporting returners</div>
+            <div class="fmap-feature">This Week's Actions + HR-to-manager guidance feature</div>
+          </div>
+          <div class="fmap-row">
+            <div class="fmap-num">7</div>
+            <div class="fmap-finding">Managers assume returner needs flexibility (3.56/5 bias score)</div>
+            <div class="fmap-feature">Bias Nudge — surfaces assumptions, not just overt discrimination</div>
+          </div>
+          <div class="fmap-row">
+            <div class="fmap-num">8</div>
+            <div class="fmap-finding">4 managers privately wondered if she was "reading too much into it"</div>
+            <div class="fmap-feature">Conversation scripts for specific high-risk scenarios</div>
+          </div>
+          <div class="fmap-row">
+            <div class="fmap-num">9</div>
+            <div class="fmap-finding">9/18 managers want a shared HR checklist and clear guidance</div>
+            <div class="fmap-feature">Checklist visible to manager; HR pushes action items directly</div>
+          </div>
+          <div class="fmap-row">
+            <div class="fmap-num">10</div>
+            <div class="fmap-finding">5/18 orgs have no formal re-onboarding process at all</div>
+            <div class="fmap-feature">HR dashboard as the structural backbone — fills the institutional gap</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:24px 0 8px;font-size:11px;color:var(--text-3);">
+        reentry · DECO7180 S1 2026 · Team Pochita · UQ
+      </div>
+
     </div>
   </main>
 </div>
 
+<!-- Bottom nav (mobile) -->
 <nav class="bottom-nav">
   <a class="nav-btn active" href="/hr" style="text-decoration:none;">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
@@ -390,76 +694,210 @@ a.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #ccc; }
     Manager
   </button>
 </nav>
+<div class="toast" id="toast"></div>
 
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="/static/data.js"></script>
 <script>
+/* ── CONSTANTS ── */
 const RETURN_DATE = '2026-04-17';
 
-// Load employee list for all pickers and sidebar links in one request
-fetch('/api/employees').then(r=>r.json()).then(data => {
-  ['emp','mgr'].forEach(role => {
-    const sel = document.getElementById('select-' + role);
-    sel.innerHTML = data.length
-      ? data.map(e => `<option value="${e.id}">${e.name} · ${e.role}</option>`).join('')
-      : '<option value="">No employees yet — add one in HR</option>';
-  });
-  if (data[0]) {
-    document.getElementById('sb-emp').href = '/employee?id=' + data[0].id;
-    document.getElementById('sb-mgr').href = '/manager?employee_id=' + data[0].id;
+/* ── CHART COLOURS ── */
+const PINK  = '#D4537E';
+const DARK  = '#2C2B29';
+const MUTED = '#A8A7A3';
+const WARM  = '#EDECEA';
+
+Chart.defaults.font.family = 'Outfit, sans-serif';
+Chart.defaults.color = '#6B6A67';
+
+/* ── CHART 1: First-week feelings (horizontal bar) ── */
+new Chart(document.getElementById('chart-feelings'), {
+  type: 'bar',
+  data: {
+    labels: ['Felt anxious about being judged', 'Felt behind / out of the loop', 'Adjusted quickly'],
+    datasets: [{
+      data: [11, 8, 2],
+      backgroundColor: [PINK, DARK, MUTED],
+      borderRadius: 4,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: {
+        max: 18,
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: { font: { size: 10 }, stepSize: 6,
+          callback: v => v + '/18' },
+      },
+      y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
   }
 });
 
+/* ── CHART 2: Support received (donut) ── */
+new Chart(document.getElementById('chart-support'), {
+  type: 'doughnut',
+  data: {
+    labels: ['No support at all', 'Treated as new starter', 'Informal support', 'Formal program'],
+    datasets: [{
+      data: [5, 2, 1, 1],
+      backgroundColor: [PINK, DARK, MUTED, '#22a06b'],
+      borderWidth: 2,
+      borderColor: '#fff',
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: {
+        position: 'right',
+        labels: { font: { size: 10 }, boxWidth: 10, padding: 8 }
+      }
+    }
+  }
+});
+
+/* ── CHART 3: Manager readiness (grouped bar) ── */
+new Chart(document.getElementById('chart-managers'), {
+  type: 'bar',
+  data: {
+    labels: ['Assumes flexibility needed', 'Uncertain what to say', 'Self-confidence supporting returners', 'Would offer high-visibility project'],
+    datasets: [{
+      label: 'Score / 5',
+      data: [3.56, 3.22, 2.94, 1.56],
+      backgroundColor: [PINK, DARK, MUTED, '#A8A7A3'],
+      borderRadius: 4,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: {
+        max: 5,
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: { font: { size: 10 }, stepSize: 1,
+          callback: v => v + '/5' },
+      },
+      y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
+  }
+});
+
+/* ── DAY COUNTER ── */
+function parseLocal(s) { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d,12); }
+function toDateStr(dt) { return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
+function calcDays(s) { return Math.max(0, Math.floor((parseLocal(s)-parseLocal(RETURN_DATE))/86400000)); }
+function updateDayDisplay() {
+  const s = DB.getDemoDate ? toDateStr(DB.getDemoDate()) : toDateStr(new Date());
+  document.getElementById('day-num').textContent = calcDays(s);
+}
+function setDay(n, btn) {
+  const s = toDateStr(new Date(parseLocal(RETURN_DATE).getTime()+n*86400000));
+  if (DB.setDemoDate) DB.setDemoDate(s);
+  document.querySelectorAll('.preset-btn-dark').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  updateDayDisplay();
+}
+updateDayDisplay();
+
+/* ── DEMO READY: reset DB + set Day 7, no confirm ── */
+async function loadDemoState() {
+  const btn = document.getElementById('btn-demo-ready');
+  btn.classList.add('loading');
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg> Loading…';
+  try {
+    await fetch('/api/reset', { method: 'POST' });
+    // Set demo date to Day 7
+    const day7 = toDateStr(new Date(parseLocal(RETURN_DATE).getTime()+7*86400000));
+    if (DB.setDemoDate) DB.setDemoDate(day7);
+    btn.classList.remove('loading');
+    btn.classList.add('done');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Demo Ready — Day 7';
+    showToast('Demo state loaded! Day 7 set.');
+    updateDayDisplay();
+    document.querySelectorAll('.preset-btn-dark').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.preset-btn-dark')[1]?.classList.add('active'); // Day 7 button
+    // Re-load employee picker
+    loadEmployees();
+  } catch(e) {
+    btn.classList.remove('loading');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Load Demo State';
+    showToast('Error — is the server running?');
+  }
+}
+
+/* ── CLEAR ALL: full reset with confirm ── */
+async function clearAll() {
+  if (!confirm('Clear all data and reset to defaults?')) return;
+  await fetch('/api/reset', { method: 'POST' });
+  if (DB.clearDemoDate) DB.clearDemoDate();
+  const btn = document.getElementById('btn-demo-ready');
+  btn.classList.remove('done','loading');
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Load Demo State';
+  document.querySelectorAll('.preset-btn-dark').forEach(b=>b.classList.remove('active'));
+  updateDayDisplay();
+  showToast('All data cleared!');
+  loadEmployees();
+}
+
+/* ── EMPLOYEE PICKER ── */
+function loadEmployees() {
+  fetch('/api/employees').then(r=>r.json()).then(data => {
+    ['emp','mgr'].forEach(role => {
+      const sel = document.getElementById('select-'+role);
+      if (!sel) return;
+      sel.innerHTML = data.length
+        ? data.map(e=>`<option value="${e.id}">${e.name} · ${e.role}</option>`).join('')
+        : '<option value="">No employees yet — add one in HR</option>';
+    });
+    if (data[0]) {
+      document.getElementById('sb-emp').href = '/employee?id='+data[0].id;
+      document.getElementById('sb-mgr').href = '/manager?employee_id='+data[0].id;
+    }
+  }).catch(()=>{});
+}
+loadEmployees();
+
 function togglePicker(role) {
   ['emp','mgr'].forEach(r => {
-    if (r !== role) document.getElementById('picker-' + r).classList.remove('open');
+    if (r!==role) document.getElementById('picker-'+r).classList.remove('open');
   });
-  const picker = document.getElementById('picker-' + role);
-  picker.classList.toggle('open');
-  // Scroll the card into view so picker is always visible (important on mobile)
-  if (picker.classList.contains('open')) {
-    picker.closest('.role-card-new').scrollIntoView({behavior:'smooth', block:'nearest'});
-  }
+  const p = document.getElementById('picker-'+role);
+  p.classList.toggle('open');
+  if (p.classList.contains('open')) p.closest('.role-card-new').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function goEmployee() {
   const id = document.getElementById('select-emp').value;
-  if (id) window.location.href = '/employee?id=' + id;
+  if (id) window.location.href = '/employee?id='+id;
 }
 function goManager() {
   const id = document.getElementById('select-mgr').value;
-  if (id) window.location.href = '/manager?employee_id=' + id;
+  if (id) window.location.href = '/manager?employee_id='+id;
 }
 
-function parseLocal(str) { const [y,m,d]=str.split('-').map(Number); return new Date(y,m-1,d,12,0,0); }
-function toDateStr(date) { return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0'); }
-function calcDays(dateStr) {
-  return Math.max(0, Math.floor((parseLocal(dateStr) - parseLocal(RETURN_DATE)) / 86400000));
-}
-function updateDisplay(dateStr) { document.getElementById('day-num').textContent = calcDays(dateStr); }
-function onDateInput(val) {
-  if (!val) return;
-  DB.setDemoDate(val);
-  updateDisplay(val);
-  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-}
-function setDay(n, btn) {
-  const str = toDateStr(new Date(parseLocal(RETURN_DATE).getTime() + n*86400000));
-  document.getElementById('date-picker').value = str;
-  DB.setDemoDate(str);
-  updateDisplay(str);
-  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-}
-async function resetAll() {
-  if (!confirm('Reset all demo data to defaults?')) return;
-  await fetch('/api/reset', { method: 'POST' });
-  DB.clearDemoDate();
-  location.reload();
-}
+/* ── FEATURE MAP TOGGLE ── */
+function toggleFmap(el) { el.classList.toggle('open'); }
 
-const cur = DB.getDemoDate();
-const curStr = toDateStr(cur);
-document.getElementById('date-picker').value = curStr;
-updateDisplay(curStr);
+/* ── TOAST ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2400);
+}
 </script>
 </body>
 </html>
