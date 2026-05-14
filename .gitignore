@@ -6,10 +6,10 @@ venv/
 .DS_Store
 *.egg-info/
 
-# Root-level frontend duplicates (real files are in templates/ and static/)
-data.js
-employee.html
-hr.html
-index.html
-manager.html
-style.css
+# Old frontend-only version (archived locally, not needed in repo)
+_archive/
+
+# Assignment docs and reports — kept locally, not for public repo
+_docs/
+*.docx
+*.pdf
