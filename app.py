@@ -30,6 +30,18 @@ def hr():
 def manager():
     return render_template('manager.html')
 
+@app.route('/onboarding/employee')
+def onboarding_employee():
+    return render_template('onboarding_employee.html')
+
+@app.route('/onboarding/hr')
+def onboarding_hr():
+    return render_template('onboarding_hr.html')
+
+@app.route('/onboarding/manager')
+def onboarding_manager():
+    return render_template('onboarding_manager.html')
+
 # ── Employees ──────────────────────────────────────────────────────────────────
 
 @app.route('/api/employees', methods=['GET'])
@@ -239,6 +251,13 @@ def add_resource():
     db.commit()
     return jsonify(dict(db.execute('SELECT * FROM resources WHERE id=?', (cur.lastrowid,)).fetchone())), 201
 
+@app.route('/api/resources/<int:rid>', methods=['DELETE'])
+def delete_resource(rid):
+    db = get_db()
+    db.execute('DELETE FROM resources WHERE id=?', (rid,))
+    db.commit()
+    return jsonify({'ok': True})
+
 # ── Bias nudges ────────────────────────────────────────────────────────────────
 
 @app.route('/api/employees/<int:eid>/nudges', methods=['GET'])
@@ -270,6 +289,26 @@ def add_diary(eid):
     )
     db.commit()
     return jsonify(dict(db.execute('SELECT * FROM diary_entries WHERE id=?', (cur.lastrowid,)).fetchone())), 201
+
+# ── Stats (HR) ─────────────────────────────────────────────────────────────
+
+@app.route('/api/stats', methods=['GET'])
+def get_stats():
+    db = get_db()
+    employees = db.execute('SELECT * FROM employees').fetchall()
+    total = len(employees)
+    checkins_count = db.execute('SELECT COUNT(*) FROM checkins').fetchone()[0]
+    items = db.execute('SELECT done FROM checklist_items').fetchall()
+    total_items = len(items)
+    done_items = sum(1 for i in items if i['done'])
+    completion_pct = round((done_items / total_items * 100) if total_items else 0)
+    return jsonify({
+        'total_employees': total,
+        'checkins_count': checkins_count,
+        'milestone_completion_pct': completion_pct,
+        'total_milestones': total_items,
+        'done_milestones': done_items,
+    })
 
 # ── Demo helpers ───────────────────────────────────────────────────────────────
 

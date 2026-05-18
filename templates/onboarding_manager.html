@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hearth — Manager Setup</title>
+<link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+<div class="onboarding-wrap">
+  <div class="onboarding-card">
+    <span class="onboarding-logo">Hearth</span>
+
+    <div class="step-progress" id="step-progress">
+      <div class="step-dot active" id="dot-1">1</div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step-dot" id="dot-2">2</div>
+      <div class="step-line" id="line-2"></div>
+      <div class="step-dot" id="dot-3">3</div>
+      <div class="step-line" id="line-3"></div>
+      <div class="step-dot" id="dot-4">4</div>
+    </div>
+
+    <!-- Step 1: Welcome -->
+    <div class="step-content active" id="step-1">
+      <div class="onboarding-header">
+        <h1>Welcome to Hearth</h1>
+        <p>One of your team members is returning to work after a career break, and Hearth is here to help you support them well.</p>
+        <p style="margin-top:10px;">Research shows that manager belief and encouragement are among the most powerful factors in a successful return. This platform gives you the tools, prompts, and resources to make that happen — without adding significant time to your workload.</p>
+        <p style="margin-top:10px;font-size:0.875rem;color:var(--text-3);">Setup takes around 3 minutes.</p>
+      </div>
+      <div class="step-nav">
+        <span></span>
+        <button class="btn btn-pink" onclick="nextStep()">Get started</button>
+      </div>
+    </div>
+
+    <!-- Step 2: About the employee's return -->
+    <div class="step-content" id="step-2">
+      <div class="onboarding-header">
+        <h1>About Sarah's return</h1>
+        <p>Here is what we know about your team member's return. Take a moment to familiarise yourself before we get you set up.</p>
+      </div>
+
+      <!-- Read-only employee info -->
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Employee</div>
+            <div style="font-weight:600;color:var(--dark);">Sarah Chen</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Job title</div>
+            <div style="font-weight:600;color:var(--dark);">Senior Designer</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Return date</div>
+            <div style="font-weight:600;color:var(--dark);">5 May 2026</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Career break length</div>
+            <div style="font-weight:600;color:var(--dark);">12 months</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ob-form-group">
+        <label class="ob-label">Have you had a return-to-work conversation with Sarah yet?</label>
+        <div class="ob-radio-group">
+          <label><input type="radio" name="conversation" value="yes"/> Yes</label>
+          <label><input type="radio" name="conversation" value="no"/> Not yet</label>
+          <label><input type="radio" name="conversation" value="scheduled"/> We have one scheduled</label>
+        </div>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Is there anything about this return you want Hearth to know? <span class="optional">(optional)</span></label>
+        <textarea class="ob-input" rows="3" placeholder="e.g. She is moving into a slightly different role, or the team has changed since she left."></textarea>
+        <div class="ob-hint">This is only visible to you. It helps Hearth tailor the guidance it gives you.</div>
+      </div>
+      <div class="step-nav">
+        <button class="btn btn-outline" onclick="prevStep()">Back</button>
+        <button class="btn btn-pink" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Briefing -->
+    <div class="step-content" id="step-3">
+      <div class="onboarding-header">
+        <h1>What good support looks like</h1>
+        <p>This is not a training module. It is a two-minute read that gives you the context behind what Hearth will ask you to do.</p>
+      </div>
+
+      <div style="background:var(--bg-2);border-left:3px solid var(--pink);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:16px 18px;margin-bottom:20px;">
+        <p style="font-size:0.9rem;color:var(--text);margin-bottom:12px;">Women returning to work after a career break often experience a gap that is structural, not personal. Skills can feel rusty. Team relationships need rebuilding. Confidence in professional identity takes time to recover. None of this is a reflection of capability.</p>
+        <p style="font-size:0.9rem;color:var(--text);margin-bottom:12px;">The research consistently shows that one of the most powerful things a manager can do is <strong>signal belief</strong>. Acknowledging the return directly, including the returning employee in decisions, and noticing their contributions early on makes a measurable difference to how quickly and confidently they re-establish themselves.</p>
+        <p style="font-size:0.9rem;color:var(--text);">Hearth will send you a small number of suggested actions over the next 90 days. These are not mandatory — they are prompts based on what the evidence says works. You are also encouraged to reach out to Sarah directly whenever it feels right.</p>
+      </div>
+
+      <div class="ob-form-group">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:0.9rem;font-weight:400;color:var(--text);">
+          <input type="checkbox" id="briefing-check" style="width:auto;accent-color:var(--dark);margin-top:2px;flex-shrink:0;"/>
+          I have read this and I am ready to support Sarah's return.
+        </label>
+      </div>
+      <div class="step-nav">
+        <button class="btn btn-outline" onclick="prevStep()">Back</button>
+        <button class="btn btn-pink" onclick="requireBriefing()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 4: You are ready -->
+    <div class="step-content" id="step-4">
+      <div class="onboarding-header">
+        <h1>You are set up, Tom.</h1>
+        <p>Your dashboard shows your suggested actions for Sarah's re-entry, your resource library, and any notifications she has chosen to share with you. You will hear from Hearth with a nudge at key moments over the next 90 days.</p>
+      </div>
+      <div class="ob-summary">
+        <div class="ob-summary-row"><span>Employee</span><span>Sarah Chen</span></div>
+        <div class="ob-summary-row"><span>Return date</span><span>5 May 2026</span></div>
+        <div class="ob-summary-row"><span>Support window closes</span><span>2 August 2026</span></div>
+        <div class="ob-summary-row"><span>Next suggested action</span><span>Week 1 check-in</span></div>
+      </div>
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-top:16px;">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Your first action</div>
+        <div style="font-size:0.9rem;color:var(--text);font-weight:600;margin-bottom:4px;">Have a welcome back conversation within the first two days</div>
+        <div style="font-size:0.85rem;color:var(--text-2);">Acknowledge the return directly. Do not treat it as a normal Monday. Suggested time: 20 to 30 minutes.</div>
+      </div>
+      <div class="step-nav">
+        <a href="/" class="btn btn-outline">Back to home</a>
+        <a href="/manager?employee_id=1" class="btn btn-pink">Go to my dashboard</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let current = 1;
+const total = 4;
+
+function showStep(n) {
+  document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  for (let i = 1; i <= total; i++) {
+    const dot = document.getElementById('dot-' + i);
+    if (i < n)        { dot.className = 'step-dot done'; dot.textContent = '✓'; }
+    else if (i === n) { dot.className = 'step-dot active'; dot.textContent = i; }
+    else              { dot.className = 'step-dot'; dot.textContent = i; }
+    if (i < total) {
+      document.getElementById('line-' + i).className = 'step-line' + (i < n ? ' done' : '');
+    }
+  }
+  window.scrollTo(0, 0);
+}
+
+function nextStep() { if (current < total) { current++; showStep(current); } }
+function prevStep() { if (current > 1)     { current--; showStep(current); } }
+
+function requireBriefing() {
+  const cb = document.getElementById('briefing-check');
+  if (!cb.checked) {
+    cb.parentElement.style.color = 'var(--alert)';
+    cb.style.outlineColor = 'var(--alert)';
+    setTimeout(() => { cb.parentElement.style.color = ''; }, 2000);
+    return;
+  }
+  nextStep();
+}
+</script>
+</body>
+</html>

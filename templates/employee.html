@@ -1,455 +1,570 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>reentry — Employee</title>
-<link rel="stylesheet" href="/static/style.css"/>
-<style>
-/* Diary styles */
-.mood-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
-.mood-btn {
-  padding:6px 14px; border-radius:20px; border:1.5px solid var(--border-strong);
-  background:transparent; color:var(--text-2); font-size:12px; font-family:'Outfit',sans-serif;
-  cursor:pointer; transition:all .15s;
-}
-.mood-btn:hover, .mood-btn.active { border-color:var(--pink); background:var(--pink-soft); color:var(--pink); }
-.diary-entry { background:var(--card-raised); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; margin-bottom:10px; box-shadow:var(--shadow); }
-.diary-entry-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-.diary-date { font-size:11px; color:var(--text-3); font-weight:600; letter-spacing:.04em; }
-.diary-mood { font-size:11px; color:var(--pink); font-weight:600; background:var(--pink-soft); padding:2px 8px; border-radius:10px; }
-.diary-text { font-size:13px; color:var(--text-2); line-height:1.6; white-space:pre-wrap; }
-</style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hearth — Employee Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+  <style>
+    .welcome-header { background: var(--primary); color: var(--white); border-radius: var(--radius); padding: 24px 28px; margin-bottom: 20px; }
+    .welcome-header h1 { color: var(--white); font-size: 1.45rem; }
+    .welcome-header small { color: rgba(255,255,255,0.65); }
+    .phase-label { font-size: 0.72rem; color: var(--primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .check-in-card { background: var(--primary-tint); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .check-in-card h3 { margin-bottom: 4px; }
+    .check-in-card p { font-size: 0.875rem; margin-bottom: 14px; }
+    .checkin-history-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+    .checkin-history-item:last-child { border-bottom: none; }
+    .score-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .score-pill { background: var(--primary-tint); color: var(--primary); border-radius: 999px; padding: 2px 8px; font-size: 0.72rem; font-weight: 600; }
+    .change-item { padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+    .change-item:last-child { border-bottom: none; }
+    .change-cat { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--primary-light); margin-bottom: 2px; }
+    .week-group { margin-bottom: 16px; }
+    .week-group-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); margin-bottom: 6px; }
+  </style>
 </head>
 <body>
-
-<div class="app-shell">
-  <aside class="sidebar">
-    <div class="sidebar-logo">re<span>entry</span></div>
-    <div class="sidebar-view-label">Employee View</div>
-    <nav class="sidebar-nav">
-      <button class="sidebar-item active" onclick="goTo('home',this)">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Dashboard
-      </button>
-      <button class="sidebar-item" onclick="goTo('checklist',this)">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>My Checklist
-      </button>
-      <button class="sidebar-item" onclick="goTo('checkin',this)">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>Weekly Check-in
-      </button>
-      <button class="sidebar-item" onclick="goTo('diary',this)">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>My Diary
-      </button>
-      <button class="sidebar-item" onclick="goTo('resources',this)">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Resources &amp; Buddy
-      </button>
-    </nav>
-  </aside>
+<div class="app-layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <span>Hearth</span><br>
+      <span class="logo-tagline">Your return-to-work space</span>
+    </div>
+    <div class="sidebar-nav">
+      <a href="#overview-section" class="active" onclick="scrollTo('overview-section',this)">Dashboard</a>
+      <a href="#milestones-section" onclick="scrollTo('milestones-section',this)">Milestones</a>
+      <a href="#checkins-section" onclick="scrollTo('checkins-section',this)">Check-ins</a>
+      <a href="#wins-section" onclick="scrollTo('wins-section',this)">Wins log</a>
+      <a href="#resources-section" onclick="scrollTo('resources-section',this)">Resources</a>
+      <a href="#whats-changed-section" onclick="scrollTo('whats-changed-section',this)">What changed</a>
+    </div>
+    <div class="sidebar-footer" id="sidebar-footer">
+      Loading… &nbsp;·&nbsp; <a href="/" style="color:rgba(255,255,255,0.5)">Switch role</a>
+    </div>
+  </nav>
 
   <main class="main-content">
-    <div class="page">
 
-      <!-- HOME -->
-      <div class="section active" id="sec-home">
-
-        <!-- ── Desktop dashboard grid (stacks naturally on mobile) ── -->
-        <div class="db-grid">
-
-          <!-- Row 1: Full-width greeting panel -->
-          <div class="panel-dark db-3">
-            <div class="panel-title-light">REENTRY — EMPLOYEE</div>
-            <div class="dash-greeting" id="h-name">Welcome back</div>
-            <div class="dash-role-tag" id="h-role"></div>
-            <div class="dash-meta-row">
-              <div class="dash-meta-item">
-                <div class="dash-meta-val" id="h-day-num">0</div>
-                <div class="dash-meta-label">DAYS BACK</div>
-              </div>
-              <div class="dash-meta-item">
-                <div class="dash-meta-val" id="conf-num">—</div>
-                <div class="dash-meta-label">CONFIDENCE</div>
-              </div>
-              <div class="dash-meta-item">
-                <div class="dash-meta-val" id="tasks-done">0</div>
-                <div class="dash-meta-label" id="tasks-total">TASKS DONE</div>
-              </div>
-              <div style="flex:1"></div>
-              <div class="day-pill" style="align-self:center;"><div class="day-pill-dot"></div><span id="h-day">Day 0 of your return</span></div>
-            </div>
-            <div class="dash-conf-bar" style="margin-top:16px;">
-              <div class="dash-conf-fill" id="conf-bar" style="width:0%"></div>
-            </div>
-          </div>
-
-          <!-- Row 2: Checklist (2 col) -->
-          <div class="panel db-2">
-            <div class="panel-title">MY CHECKLIST — THIS WEEK</div>
-            <div id="home-checklist"></div>
-            <span class="panel-link" onclick="goTo('checklist',null)">View all tasks →</span>
-          </div>
-
-          <!-- Row 2: Quick Check-in CTA -->
-          <div class="cta-card">
-            <div class="cta-icon">✓</div>
-            <div class="cta-title">Weekly Check-in</div>
-            <div class="cta-sub">Share how you're feeling with your HR team · takes 2 mins</div>
-            <button class="cta-btn" onclick="goTo('checkin',null)">Start check-in →</button>
-          </div>
-
-          <!-- Row 3: What Changed -->
-          <div class="panel">
-            <div class="panel-title">WHAT CHANGED WHILE YOU WERE AWAY</div>
-            <div id="home-changes"></div>
-          </div>
-
-          <!-- Row 3: Manager + Buddy -->
-          <div class="panel">
-            <div class="panel-title">FROM YOUR MANAGER</div>
-            <div id="manager-notif"></div>
-            <div id="dash-buddy"></div>
-          </div>
-
-          <!-- Row 3: Resources quick links -->
-          <div class="panel">
-            <div class="panel-title">RESOURCES</div>
-            <div id="dash-resources"></div>
-            <span class="panel-link" onclick="goTo('resources',null)">View all →</span>
-          </div>
-
-        </div><!-- /db-grid -->
-      </div>
-
-      <!-- CHECKLIST -->
-      <div class="section" id="sec-checklist">
-        <div class="dark-header">
-          <div class="eyebrow">MY CHECKLIST</div>
-          <h1>Your milestones</h1>
-          <div class="sub">Tap to mark complete</div>
-        </div>
-        <div id="full-checklist" class="stagger mt-16"></div>
-      </div>
-
-      <!-- CHECK-IN -->
-      <div class="section" id="sec-checkin">
-        <div class="dark-header">
-          <div class="eyebrow">WEEKLY CHECK-IN</div>
-          <h1>How are you feeling?</h1>
-          <div class="sub">Shared with your HR team · takes 2 mins</div>
-        </div>
-        <div class="card mt-16">
-          <div id="checkin-form">
-            <div class="form-group" style="margin-top:0;">
-              <label class="form-label">Date of this check-in</label>
-              <input type="date" class="form-input" id="checkin-date" style="max-width:200px;"/>
-            </div>
-            <div class="slider-row"><div class="slider-label">Sense of belonging<span class="val" id="v-belonging">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('belonging',this.value)"/></div>
-            <div class="slider-row"><div class="slider-label">Confidence at work<span class="val" id="v-confidence">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('confidence',this.value)"/></div>
-            <div class="slider-row"><div class="slider-label">Feeling included<span class="val" id="v-inclusion">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('inclusion',this.value)"/></div>
-            <div class="slider-row"><div class="slider-label">Support received<span class="val" id="v-support">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('support',this.value)"/></div>
-            <div class="slider-row"><div class="slider-label">Professional visibility<span class="val" id="v-visibility">3</span></div><input type="range" min="1" max="5" value="3" step="1" oninput="updateSlider('visibility',this.value)"/></div>
-            <div class="form-group">
-              <label class="form-label">Anything else to share?</label>
-              <textarea class="form-input" id="checkin-note" rows="3" placeholder="Optional — only you and HR can see this"></textarea>
-            </div>
-            <button class="btn btn-pink btn-full mt-16" onclick="submitCheckin()">Save check-in →</button>
-          </div>
-          <div id="checkin-done" style="display:none;text-align:center;padding:32px 0;">
-            <div style="font-size:44px;margin-bottom:12px;">✓</div>
-            <div style="font-size:16px;font-weight:600;">Check-in saved!</div>
-            <div class="text-muted text-sm" style="margin-top:6px;">Your HR team has been notified.</div>
-          </div>
-        </div>
-        <div class="section-label">PREVIOUS CHECK-INS</div>
-        <div id="checkin-history" class="stagger"></div>
-      </div>
-
-      <!-- DIARY -->
-      <div class="section" id="sec-diary">
-        <div class="dark-header">
-          <div class="eyebrow">MY DIARY</div>
-          <h1>Your private journal</h1>
-          <div class="sub">Only you can see this · write freely</div>
-        </div>
-        <div class="card mt-16">
-          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;">How are you feeling today?</div>
-          <div class="mood-row" id="mood-row">
-            <button class="mood-btn" onclick="selectMood(this,'Confident')">😊 Confident</button>
-            <button class="mood-btn" onclick="selectMood(this,'Hopeful')">🌱 Hopeful</button>
-            <button class="mood-btn" onclick="selectMood(this,'Uncertain')">🤔 Uncertain</button>
-            <button class="mood-btn" onclick="selectMood(this,'Anxious')">😟 Anxious</button>
-            <button class="mood-btn" onclick="selectMood(this,'Frustrated')">😤 Frustrated</button>
-          </div>
-          <div class="form-group" style="margin-top:0;">
-            <label class="form-label">Date</label>
-            <input type="date" class="form-input" id="diary-date" style="max-width:200px;"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Write about your day</label>
-            <textarea class="form-input" id="diary-text" rows="5" placeholder="What happened today? How did it make you feel? What are you proud of? What was hard?"></textarea>
-          </div>
-          <button class="btn btn-pink btn-full mt-16" onclick="saveDiary()">Save entry →</button>
-        </div>
-        <div class="section-label">PAST ENTRIES</div>
-        <div id="diary-list" class="stagger"></div>
-      </div>
-
-      <!-- RESOURCES -->
-      <div class="section" id="sec-resources">
-        <div class="dark-header">
-          <div class="eyebrow">RESOURCES & BUDDY</div>
-          <h1>Your support network</h1>
-          <div class="sub">Curated by HR for your return</div>
-        </div>
-        <div class="section-label" style="margin-top:20px;">MY BUDDY</div>
-        <div class="person-row">
-          <div class="avatar avatar-lg avatar-pink" id="buddy-avatar">?</div>
-          <div style="flex:1;"><div class="person-name" id="buddy-name">—</div><div class="person-sub">Your assigned buddy</div></div>
-          <button class="btn btn-ghost btn-sm" onclick="showToast('Opening email...')">✉ Email</button>
-        </div>
-        <div class="section-label">MY MANAGER</div>
-        <div class="person-row">
-          <div class="avatar avatar-lg avatar-dark" id="manager-avatar">?</div>
-          <div style="flex:1;"><div class="person-name" id="manager-name">—</div><div class="person-sub">Your manager</div></div>
-          <button class="btn btn-ghost btn-sm" onclick="showToast('Opening email...')">✉ Email</button>
-        </div>
-        <div class="section-label">FROM YOUR MANAGER</div>
-        <div id="manager-msgs" class="stagger"></div>
-        <div class="section-label">RESOURCE HUB</div>
-        <div id="resource-list" class="stagger"></div>
-      </div>
-
+    <!-- Welcome header -->
+    <div class="welcome-header" id="overview-section">
+      <h1 id="welcome-title">Loading…</h1>
+      <small id="welcome-sub"></small>
     </div>
+
+    <!-- Progress bar -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="progress-wrap">
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div class="progress-labels">
+          <span>First two weeks</span>
+          <span>First month</span>
+          <span>Full 90 days</span>
+        </div>
+      </div>
+      <p id="progress-text" style="font-size:0.85rem;margin-top:10px;color:var(--text-secondary);"></p>
+    </div>
+
+    <!-- Milestones + Check-in prompt -->
+    <div class="dash-row dash-row-2" style="margin-bottom:20px;" id="milestones-section">
+
+      <div class="card">
+        <div class="phase-label" id="phase-label">Your milestones</div>
+        <h2 style="margin-bottom:14px;">Milestones</h2>
+        <div id="milestone-list"><p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p></div>
+        <a href="#" class="panel-link" onclick="showAllMilestones(); return false;">View all milestones →</a>
+      </div>
+
+      <div>
+        <div class="check-in-card" id="checkin-card">
+          <h3>This week's check-in</h3>
+          <p>A short reflection on how your return is going. Private by default — nothing is shared unless you choose.</p>
+          <button class="btn btn-primary" onclick="openCheckin()">Start check-in</button>
+        </div>
+        <div style="padding:16px 0 0;font-size:0.8rem;color:var(--text-secondary);">
+          Keep recording — every check-in builds your progress picture.
+        </div>
+      </div>
+    </div>
+
+    <!-- Manager nudges -->
+    <div id="nudges-container"></div>
+
+    <!-- Wins log + Resources -->
+    <div class="dash-row dash-row-2" style="margin-bottom:20px;" id="wins-section">
+      <div class="card">
+        <h2>Wins log</h2>
+        <p style="font-size:0.8rem;margin-bottom:12px;">A private space to record small wins and moments you are proud of.</p>
+        <div class="wins-input-row">
+          <input type="text" id="win-input" placeholder="Something went well today…" maxlength="280"/>
+          <button class="btn btn-primary btn-sm" onclick="addWin()">Add</button>
+        </div>
+        <div id="wins-list"><p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p></div>
+      </div>
+
+      <div class="card" id="resources-section">
+        <h2>Resources for you</h2>
+        <p style="font-size:0.8rem;margin-bottom:14px;">Curated for women returning after a career break.</p>
+        <div id="resource-list" style="display:flex;flex-direction:column;gap:10px;">
+          <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Check-in history -->
+    <div class="card" style="margin-bottom:20px;" id="checkins-section">
+      <h2>Check-in history</h2>
+      <p style="font-size:0.85rem;margin-bottom:16px;">Your weekly reflections over time. Private — only visible to you.</p>
+      <div id="checkin-history"><p style="color:var(--text-secondary);font-size:0.875rem;">No check-ins recorded yet.</p></div>
+    </div>
+
+    <!-- Support + connections -->
+    <div class="dash-row dash-row-3" style="margin-bottom:20px;">
+      <div class="connection-card">
+        <h4>Need support?</h4>
+        <p>Let your HR team know you would like some help. Private and low friction.</p>
+        <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="openSupportModal()">Request support</button>
+      </div>
+      <div class="connection-card" id="buddy-card">
+        <h4>Buddy pairing</h4>
+        <span class="badge badge-green" id="buddy-badge" style="margin-bottom:6px;">Confirmed</span>
+        <p id="buddy-text">Your buddy is here to be a friendly point of contact during re-entry.</p>
+      </div>
+      <div class="connection-card">
+        <h4>Mentor pairing</h4>
+        <span class="badge badge-grey" style="margin-bottom:6px;">Not opted in</span>
+        <p>You can opt in to mentoring at any time from settings.</p>
+        <a href="#" class="panel-link" style="margin-top:4px;">Change preference</a>
+      </div>
+    </div>
+
+    <!-- What Changed digest -->
+    <div class="card" id="whats-changed-section">
+      <h2>What changed while you were away</h2>
+      <p style="font-size:0.85rem;margin-bottom:16px;">Updates from HR on things that have changed since you left.</p>
+      <div id="changes-list"><p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p></div>
+    </div>
+
   </main>
 </div>
 
-<a href="/" class="home-fab" title="Demo Portal">⌂</a>
-<nav class="bottom-nav">
-  <button class="nav-btn active" onclick="goTo('home',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
-  <button class="nav-btn" onclick="goTo('checklist',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Checklist</button>
-  <button class="nav-btn" onclick="goTo('checkin',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>Check-in</button>
-  <button class="nav-btn" onclick="goTo('diary',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>Diary</button>
-  <button class="nav-btn" onclick="goTo('resources',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Resources</button>
-</nav>
-<div class="toast" id="toast"></div>
+<!-- All milestones modal -->
+<div class="modal-overlay" id="all-milestones-modal">
+  <div class="modal" style="position:relative;width:min(560px,92vw);max-height:80vh;overflow-y:auto;">
+    <button class="modal-close" onclick="closeModal('all-milestones-modal')">×</button>
+    <h2 style="margin-bottom:16px;">All milestones</h2>
+    <div id="all-milestones-body"></div>
+  </div>
+</div>
 
-<script src="/static/data.js"></script>
+<!-- Check-in Modal -->
+<div class="modal-overlay" id="checkin-modal">
+  <div class="modal" style="position:relative;max-height:90vh;overflow-y:auto;">
+    <button class="modal-close" onclick="closeModal('checkin-modal')">×</button>
+    <h2>Weekly check-in</h2>
+    <p style="font-size:0.875rem;margin-bottom:20px;color:var(--text-secondary);">Your answers are private. Nothing here is shared unless you choose to share it.</p>
+    <div class="checkin-q">
+      <label>Sense of belonging this week (1 = very low, 5 = very high)</label>
+      <div class="star-row" id="star-belonging">
+        <button class="star-btn" onclick="selectStar('belonging',1)">1</button>
+        <button class="star-btn" onclick="selectStar('belonging',2)">2</button>
+        <button class="star-btn" onclick="selectStar('belonging',3)">3</button>
+        <button class="star-btn" onclick="selectStar('belonging',4)">4</button>
+        <button class="star-btn" onclick="selectStar('belonging',5)">5</button>
+      </div>
+    </div>
+    <div class="checkin-q">
+      <label>Confidence in your role (1 = very low, 5 = very high)</label>
+      <div class="star-row" id="star-confidence">
+        <button class="star-btn" onclick="selectStar('confidence',1)">1</button>
+        <button class="star-btn" onclick="selectStar('confidence',2)">2</button>
+        <button class="star-btn" onclick="selectStar('confidence',3)">3</button>
+        <button class="star-btn" onclick="selectStar('confidence',4)">4</button>
+        <button class="star-btn" onclick="selectStar('confidence',5)">5</button>
+      </div>
+    </div>
+    <div class="checkin-q">
+      <label>Feeling included in team discussions (1 = very low, 5 = very high)</label>
+      <div class="star-row" id="star-inclusion">
+        <button class="star-btn" onclick="selectStar('inclusion',1)">1</button>
+        <button class="star-btn" onclick="selectStar('inclusion',2)">2</button>
+        <button class="star-btn" onclick="selectStar('inclusion',3)">3</button>
+        <button class="star-btn" onclick="selectStar('inclusion',4)">4</button>
+        <button class="star-btn" onclick="selectStar('inclusion',5)">5</button>
+      </div>
+    </div>
+    <div class="checkin-q">
+      <label>Feeling supported by your manager (1 = very low, 5 = very high)</label>
+      <div class="star-row" id="star-support">
+        <button class="star-btn" onclick="selectStar('support',1)">1</button>
+        <button class="star-btn" onclick="selectStar('support',2)">2</button>
+        <button class="star-btn" onclick="selectStar('support',3)">3</button>
+        <button class="star-btn" onclick="selectStar('support',4)">4</button>
+        <button class="star-btn" onclick="selectStar('support',5)">5</button>
+      </div>
+    </div>
+    <div class="checkin-q">
+      <label>Visibility at work — feeling seen and heard (1 = very low, 5 = very high)</label>
+      <div class="star-row" id="star-visibility">
+        <button class="star-btn" onclick="selectStar('visibility',1)">1</button>
+        <button class="star-btn" onclick="selectStar('visibility',2)">2</button>
+        <button class="star-btn" onclick="selectStar('visibility',3)">3</button>
+        <button class="star-btn" onclick="selectStar('visibility',4)">4</button>
+        <button class="star-btn" onclick="selectStar('visibility',5)">5</button>
+      </div>
+    </div>
+    <div class="checkin-q">
+      <label>Anything you'd like to note? <span style="font-weight:400;color:var(--text-secondary);">(optional)</span></label>
+      <textarea id="checkin-note" placeholder="Take your time…" rows="2"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('checkin-modal')">Save for later</button>
+      <button class="btn btn-primary" onclick="submitCheckin()">Save check-in</button>
+    </div>
+  </div>
+</div>
+
+<!-- Support Request Modal -->
+<div class="modal-overlay" id="support-modal">
+  <div class="modal" style="position:relative;" id="support-modal-inner">
+    <button class="modal-close" onclick="closeModal('support-modal')">×</button>
+    <h2>Request support</h2>
+    <p style="font-size:0.875rem;margin-bottom:20px;color:var(--text-secondary);">This goes to HR. You will hear back shortly. Nothing is shared without your consent.</p>
+    <div class="form-group">
+      <label for="support-type">What kind of support are you looking for?</label>
+      <select id="support-type">
+        <option value="">Select an option</option>
+        <option>A conversation with HR</option>
+        <option>A conversation with my manager</option>
+        <option>A change to my workload or schedule</option>
+        <option>Buddy or mentor pairing assistance</option>
+        <option>Something else</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="support-context">Any context you want to add? <span style="font-weight:400;color:var(--text-secondary);">(optional)</span></label>
+      <textarea id="support-context" placeholder="You do not need to explain everything here." rows="3"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('support-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitSupport()">Submit request</button>
+    </div>
+  </div>
+  <div class="modal" id="support-confirm" style="display:none;position:relative;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:12px;">✅</div>
+    <h2>Request received</h2>
+    <p style="margin:10px 0 20px;">Your request has been received. Someone from your team will be in touch shortly.</p>
+    <button class="btn btn-primary" onclick="closeModal('support-modal')">Done</button>
+  </div>
+</div>
+
 <script>
-const empId = parseInt(new URLSearchParams(window.location.search).get('id') || '1');
-const sv = {belonging:3, confidence:3, inclusion:3, support:3, visibility:3};
-let selectedMood = '';
+const params = new URLSearchParams(location.search);
+const EID = parseInt(params.get('id') || '1');
+const TODAY = new Date().toISOString().slice(0, 10);
+let starVals = { belonging: 3, confidence: 3, inclusion: 3, support: 3, visibility: 3 };
+let allChecklist = [];
 
-function initials(n){ return (n||'?').split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2); }
-function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function scrollTo(id, link) {
+  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+  link.classList.add('active');
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+  return false;
+}
 
-function goTo(id, btn){
-  if(window.innerWidth >= 900){
-    // Desktop: scroll to section, keep all visible
-    document.getElementById('sec-'+id).scrollIntoView({behavior:'smooth', block:'start'});
-    document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.sidebar-item').forEach(b=>{
-      if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+function fmt(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+async function init() {
+  const [emp, checklist, diary, msgs, resources, nudges, changes, checkins] = await Promise.all([
+    fetch(`/api/employees/${EID}`).then(r => r.json()),
+    fetch(`/api/employees/${EID}/checklist`).then(r => r.json()),
+    fetch(`/api/employees/${EID}/diary`).then(r => r.json()),
+    fetch(`/api/employees/${EID}/messages`).then(r => r.json()),
+    fetch('/api/resources').then(r => r.json()),
+    fetch(`/api/employees/${EID}/nudges`).then(r => r.json()),
+    fetch('/api/changes').then(r => r.json()),
+    fetch(`/api/employees/${EID}/checkins`).then(r => r.json()),
+  ]);
+
+  allChecklist = checklist;
+
+  const startDate = new Date(emp.start_date || TODAY);
+  const dayNum = Math.max(1, Math.floor((new Date() - startDate) / 86400000) + 1);
+  const closeDate = new Date(startDate);
+  closeDate.setDate(closeDate.getDate() + 90);
+  const daysLeft = Math.max(0, Math.ceil((closeDate - new Date()) / 86400000));
+
+  document.getElementById('welcome-title').textContent =
+    `Good to see you, ${emp.name.split(' ')[0]}. You are ${dayNum} day${dayNum === 1 ? '' : 's'} in.`;
+  document.getElementById('welcome-sub').textContent =
+    `Return date: ${fmt(emp.start_date)} · Support window closes ${fmt(closeDate)} · ${daysLeft} days remaining`;
+  document.getElementById('sidebar-footer').innerHTML =
+    `Day ${dayNum} of 90 &nbsp;·&nbsp; <a href="/" style="color:rgba(255,255,255,0.5)">Switch role</a>`;
+
+  const pct = Math.min(100, (dayNum / 90) * 100).toFixed(1);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').innerHTML =
+    `Day ${dayNum} of 90 &mdash; ${pct}% of your support window. Active support closes on <strong>${fmt(closeDate)}</strong>.`;
+
+  const phase = dayNum <= 14 ? 1 : dayNum <= 30 ? 2 : 3;
+  const phaseLabels = ['', 'Phase 1 — First two weeks', 'Phase 2 — First month', 'Phase 3 — Full 90 days'];
+  document.getElementById('phase-label').textContent = phaseLabels[phase];
+
+  // Show current phase milestones (first undone + recently done)
+  const currentItems = checklist.filter(i => i.week <= phase + 1).slice(-6);
+  renderMilestones(currentItems, document.getElementById('milestone-list'), true);
+
+  // Buddy info
+  if (emp.buddy_name) {
+    document.getElementById('buddy-badge').textContent = 'Confirmed';
+    document.getElementById('buddy-badge').className = 'badge badge-green';
+    document.getElementById('buddy-text').textContent = `Your buddy is ${emp.buddy_name}. Reach out any time.`;
+  } else {
+    document.getElementById('buddy-badge').textContent = 'Pending';
+    document.getElementById('buddy-badge').className = 'badge badge-grey';
+    document.getElementById('buddy-text').textContent = 'HR is arranging your buddy pairing.';
+  }
+
+  // Wins log
+  const winsList = document.getElementById('wins-list');
+  if (diary.length === 0) {
+    winsList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No wins recorded yet. Add one above — even small things count.</p>';
+  } else {
+    winsList.innerHTML = diary.slice(0, 5).map(d => `
+      <div class="win-entry">
+        <div>${d.text}</div>
+        <div class="win-date">${d.date}</div>
+      </div>
+    `).join('');
+  }
+
+  // Resources — filter to employee-facing
+  const empResources = resources.filter(r => !r.category.toLowerCase().startsWith('manager') && !r.category.toLowerCase().startsWith('policy'));
+  const resList = document.getElementById('resource-list');
+  if (empResources.length === 0) {
+    resList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No resources added yet.</p>';
+  } else {
+    resList.innerHTML = empResources.slice(0, 5).map(r => `
+      <div class="resource-card">
+        <div class="rc-meta">
+          <span class="badge badge-purple">${r.category}</span>
+        </div>
+        <h4>${r.title}</h4>
+        ${r.url && r.url !== '#' ? `<a href="${r.url}" target="_blank" style="font-size:0.8rem;">Open resource →</a>` : ''}
+      </div>
+    `).join('');
+  }
+
+  // Manager nudges (messages)
+  const nudgesContainer = document.getElementById('nudges-container');
+  if (msgs.length > 0) {
+    msgs.slice(0, 2).forEach(m => {
+      const card = document.createElement('div');
+      card.className = 'nudge-card';
+      card.style.marginBottom = '16px';
+      card.innerHTML = `
+        <div class="nudge-icon">💬</div>
+        <div class="nudge-body">
+          <p><strong>From ${emp.manager_name || 'your manager'}:</strong> ${m.text}</p>
+          <small>Received ${m.date}</small>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="this.closest('.nudge-card').remove()">Dismiss</button>
+      `;
+      nudgesContainer.appendChild(card);
     });
+  }
+  nudges.forEach(n => {
+    const card = document.createElement('div');
+    card.className = 'nudge-card';
+    card.style.marginBottom = '16px';
+    card.innerHTML = `
+      <div class="nudge-icon">💡</div>
+      <div class="nudge-body"><p>${n.text}</p></div>
+      <button class="btn btn-ghost btn-sm" onclick="dismissNudge(${n.id}, this)">Dismiss</button>
+    `;
+    nudgesContainer.appendChild(card);
+  });
+
+  // Check-in history
+  const histEl = document.getElementById('checkin-history');
+  if (checkins.length === 0) {
+    histEl.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No check-ins recorded yet. Start your first check-in above.</p>';
+  } else {
+    histEl.innerHTML = [...checkins].reverse().map(c => {
+      const avg = ((c.belonging + c.confidence + c.inclusion + c.support + c.visibility) / 5).toFixed(1);
+      return `
+        <div class="checkin-history-item">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div style="font-weight:600;">${c.date}</div>
+            <span class="badge badge-purple">Avg ${avg}/5</span>
+          </div>
+          <div class="score-pills">
+            <span class="score-pill">Belonging ${c.belonging}</span>
+            <span class="score-pill">Confidence ${c.confidence}</span>
+            <span class="score-pill">Inclusion ${c.inclusion}</span>
+            <span class="score-pill">Support ${c.support}</span>
+            <span class="score-pill">Visibility ${c.visibility}</span>
+          </div>
+          ${c.note ? `<div style="margin-top:6px;font-size:0.82rem;color:var(--text-secondary);font-style:italic;">"${c.note}"</div>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // What changed
+  const changesList = document.getElementById('changes-list');
+  if (changes.length === 0) {
+    changesList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No updates from HR yet.</p>';
+  } else {
+    changesList.innerHTML = changes.map(c => `
+      <div class="change-item">
+        <div class="change-cat">${c.category}</div>
+        <div style="font-weight:600;margin-bottom:3px;">${c.title}</div>
+        <div style="color:var(--text-secondary);font-size:0.85rem;">${c.body}</div>
+        <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:4px;">${c.date}</div>
+      </div>
+    `).join('');
+  }
+}
+
+function renderMilestones(items, container, compact) {
+  if (items.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No milestones for this phase yet.</p>';
     return;
   }
-  // Mobile: classic tab switch
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item,.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('sec-'+id).classList.add('active');
-  document.querySelectorAll('.sidebar-item,.nav-btn').forEach(b=>{
-    if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
-  });
-  render();
-}
-
-function updateSlider(dim, val){ sv[dim]=parseInt(val); document.getElementById('v-'+dim).textContent=val; }
-
-function selectMood(btn, mood){
-  selectedMood = mood;
-  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-async function toggleItem(id){
-  const cl = DB.get('checklist');
-  const item = cl.find(c=>c.id===id);
-  if(item){
-    await DB.toggleChecklist(id, !item.done);
-    render();
-  }
-}
-
-function toDisplayDate(isoStr){
-  const [y,m,d] = isoStr.split('-').map(Number);
-  return new Date(y,m-1,d).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
-}
-function toISOStr(date){ return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0'); }
-
-async function submitCheckin(){
-  const raw = document.getElementById('checkin-date').value || toISOStr(DB.getDemoDate());
-  const today = toDisplayDate(raw);
-  await DB.submitCheckin({date:today, ...sv, note:document.getElementById('checkin-note').value});
-  document.getElementById('checkin-form').style.display='none';
-  document.getElementById('checkin-done').style.display='block';
-  showToast('Check-in saved!');
-  render();
-  setTimeout(()=>{
-    document.getElementById('checkin-form').style.display='block';
-    document.getElementById('checkin-done').style.display='none';
-    document.getElementById('checkin-note').value='';
-  },3000);
-}
-
-async function saveDiary(){
-  const text = document.getElementById('diary-text').value.trim();
-  if(!text){ showToast('Write something first'); return; }
-  const raw = document.getElementById('diary-date').value || toISOStr(DB.getDemoDate());
-  const today = toDisplayDate(raw);
-  await DB.addDiaryEntry(text, today, selectedMood);
-  document.getElementById('diary-text').value='';
-  selectedMood='';
-  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));
-  showToast('Entry saved!');
-  render();
-}
-
-function render(){
-  const emp=DB.get('employee')||{}, cl=DB.get('checklist')||[], ch=DB.get('whatChanged')||[],
-        res=DB.get('resources')||[], ci=DB.get('checkins')||[],
-        diary=DB.get('diary')||[], mf=DB.get('managerFeedback')||[],
-        days=DB.daysSinceReturn(), avg=DB.avgCheckin();
-
-  document.getElementById('h-name').textContent='Welcome back, '+(emp.name||'').split(' ')[0];
-  document.getElementById('h-role').textContent=emp.role||'';
-  document.getElementById('h-day').textContent='Day '+days+' of your return';
-  document.getElementById('h-day-num').textContent=days;
-
-  if(avg){
-    const p=Math.round((parseFloat(avg)/5)*100);
-    document.getElementById('conf-num').textContent=p+'%';
-    document.getElementById('conf-bar').style.width=p+'%';
-  }
-  const done=cl.filter(c=>c.done).length;
-  document.getElementById('tasks-done').textContent=done;
-  document.getElementById('tasks-total').textContent='OF '+cl.length+' TASKS';
-
-  // home checklist — compact dash-check-item style
-  document.getElementById('home-checklist').innerHTML=cl.filter(c=>c.week<=2).slice(0,5).map(item=>
-    `<div class="dash-check-item" onclick="toggleItem(${item.id})">
-      <div class="check-box ${item.done?'done':''}" style="flex-shrink:0;"></div>
-      <div class="check-text ${item.done?'done':''}" style="font-size:13px;flex:1;">${item.text}</div>
-      <div class="week-badge" style="flex-shrink:0;">Wk ${item.week}</div>
-    </div>`).join('') || '<div class="empty">No tasks yet.</div>';
-
-  // home changes — compact dash-change-item style
-  document.getElementById('home-changes').innerHTML=ch.slice(0,3).map(c=>
-    `<div class="dash-change-item">
-      <div class="dash-change-cat">${c.category}</div>
-      <div class="dash-change-title">${c.title}</div>
-      <div class="dash-change-body">${c.body}</div>
-    </div>`).join('') || '<div class="empty">Nothing yet.</div>';
-
-  // full checklist
-  const fcl=document.getElementById('full-checklist');
-  if(fcl){
-    fcl.innerHTML=[...new Set(cl.map(c=>c.week))].map(w=>
-      `<div class="section-label">WEEK ${w}</div>`+
-      cl.filter(c=>c.week===w).map(item=>
-        `<div class="checklist-item" onclick="toggleItem(${item.id})">
-          <div class="check-box ${item.done?'done':''}"></div>
-          <div class="check-text ${item.done?'done':''}">${item.text}</div>
-          ${item.addedBy==='manager'?'<div class="week-badge" style="background:var(--pink-soft);color:var(--pink);">Manager</div>':''}
-        </div>`).join('')).join('');
-  }
-
-  // resources
-  const rl=document.getElementById('resource-list');
-  if(rl){
-    rl.innerHTML=res.map(r=>
-      `<div class="list-item flex gap-12" style="align-items:center;cursor:pointer;" onclick="showToast('Opening...')">
-        <div class="avatar avatar-md avatar-dark" style="border-radius:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--pink)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-        <div><div class="list-item-title" style="margin:0;">${r.title}</div><div class="text-xs text-muted">${r.category}</div></div>
-      </div>`).join('');
-  }
-
-  // manager message panel + buddy panel
-  const notif=document.getElementById('manager-notif');
-  if(notif){
-    notif.innerHTML=mf.length
-      ?`<div class="dash-change-item" style="border:none;padding:0;">
-          <div class="dash-change-cat">${mf[0].date}</div>
-          <div class="dash-change-body" style="font-size:12px;line-height:1.5;">"${mf[0].text}"</div>
-          <span style="font-size:11px;color:var(--pink);cursor:pointer;margin-top:6px;display:block;" onclick="goTo('resources',null)">See all messages →</span>
-        </div>`
-      :'<div class="empty" style="font-size:12px;">No messages yet.</div>';
-  }
-  const buddyEl=document.getElementById('dash-buddy');
-  if(buddyEl && emp.buddy){
-    buddyEl.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
-      <div class="avatar avatar-md avatar-pink">${initials(emp.buddy)}</div>
-      <div><div style="font-size:13px;font-weight:600;color:var(--text);">${emp.buddy}</div><div style="font-size:11px;color:var(--text-3);">Your buddy</div></div>
-      <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="showToast('Opening email...')">✉</button>
-    </div>`;
-  }
-
-  // dash resources
-  const dr=document.getElementById('dash-resources');
-  if(dr){
-    dr.innerHTML=res.slice(0,3).map(r=>
-      `<div class="dash-change-item" style="cursor:pointer;" onclick="showToast('Opening...')">
-        <div class="dash-change-cat">${r.category}</div>
-        <div class="dash-change-title" style="font-size:12px;">${r.title}</div>
-      </div>`).join('') || '<div class="empty" style="font-size:12px;">No resources yet.</div>';
-  }
-
-  // manager messages in resources tab
-  const mmEl=document.getElementById('manager-msgs');
-  if(mmEl){
-    mmEl.innerHTML=!mf.length
-      ?'<div class="empty">No messages from your manager yet.</div>'
-      :mf.slice(0,5).map(m=>
-        `<div class="accent-item"><div class="accent-item-label">FROM YOUR MANAGER · ${m.date}</div><div class="accent-item-body">${m.text}</div></div>`).join('');
-  }
-
-  // buddy
-  document.getElementById('buddy-avatar').textContent=initials(emp.buddy||'');
-  document.getElementById('buddy-name').textContent=emp.buddy||'—';
-  document.getElementById('manager-avatar').textContent=initials(emp.manager||'');
-  document.getElementById('manager-name').textContent=emp.manager||'—';
-
-  // checkin history
-  const ch2=document.getElementById('checkin-history');
-  if(ch2){
-    ch2.innerHTML=!ci.length
-      ?'<div class="empty">No check-ins yet. Complete your first one above!</div>'
-      :ci.slice(-5).reverse().map(c=>{
-        const dims=[c.belonging,c.confidence,c.inclusion,c.support,c.visibility];
-        const a=(dims.reduce((x,y)=>x+y,0)/5).toFixed(1);
-        return`<div class="card mt-8"><div class="flex-between"><div class="text-sm text-muted">${c.date}</div><div style="font-size:20px;font-weight:700;" class="text-pink">${a}<span class="text-muted" style="font-size:12px;font-weight:400;">/5</span></div></div>${c.note?`<div class="text-sm text-muted mt-8" style="font-style:italic;">"${c.note}"</div>`:''}</div>`;
-      }).join('');
-  }
-
-  // diary
-  const dl=document.getElementById('diary-list');
-  if(dl){
-    dl.innerHTML=!diary.length
-      ?'<div class="empty">No entries yet. Write your first one above.</div>'
-      :diary.map(e=>
-        `<div class="diary-entry">
-          <div class="diary-entry-header">
-            <span class="diary-date">${e.date}</span>
-            ${e.mood?`<span class="diary-mood">${e.mood}</span>`:''}
+  // Group by week
+  const byWeek = {};
+  items.forEach(i => { (byWeek[i.week] = byWeek[i.week] || []).push(i); });
+  container.innerHTML = Object.keys(byWeek).sort((a,b) => a-b).map(week => `
+    <div class="week-group">
+      <div class="week-group-label">Week ${week}</div>
+      ${byWeek[week].map(item => `
+        <div class="milestone-item" data-id="${item.id}">
+          <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleMilestone(this, ${item.id})">
+          <div style="flex:1">
+            <div class="milestone-label${item.done ? ' done' : ''}">${item.text}</div>
+            ${item.done ? '<div class="milestone-meta">Completed</div>' : ''}
           </div>
-          <div class="diary-text">${e.text}</div>
-        </div>`).join('');
-  }
+          <button class="share-btn${item.done ? ' visible' : ''}" onclick="shareToggle(this)">Share</button>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
 }
 
-DB.init(empId).then(() => {
-  const iso = toISOStr(DB.getDemoDate());
-  document.getElementById('checkin-date').value = iso;
-  document.getElementById('diary-date').value = iso;
-  render();
+function showAllMilestones() {
+  const modal = document.getElementById('all-milestones-modal');
+  renderMilestones(allChecklist, document.getElementById('all-milestones-body'), false);
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+async function toggleMilestone(cb, id) {
+  const item = cb.closest('.milestone-item');
+  const label = item.querySelector('.milestone-label');
+  const shareBtn = item.querySelector('.share-btn');
+  if (cb.checked) { label.classList.add('done'); shareBtn.classList.add('visible'); }
+  else { label.classList.remove('done'); shareBtn.classList.remove('visible'); }
+  await fetch(`/api/checklist/${id}`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ done: cb.checked })
+  });
+}
+
+function shareToggle(btn) {
+  if (btn.classList.contains('shared')) return;
+  btn.textContent = 'Shared';
+  btn.classList.add('shared', 'visible');
+}
+
+async function addWin() {
+  const input = document.getElementById('win-input');
+  const text = input.value.trim();
+  if (!text) return;
+  await fetch(`/api/employees/${EID}/diary`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ date: TODAY, text, mood: '' })
+  });
+  const list = document.getElementById('wins-list');
+  const p = list.querySelector('p');
+  if (p) p.remove();
+  const entry = document.createElement('div');
+  entry.className = 'win-entry';
+  entry.innerHTML = `<div>${text}</div><div class="win-date">${TODAY}</div>`;
+  list.prepend(entry);
+  input.value = '';
+}
+
+function selectStar(field, val) {
+  starVals[field] = val;
+  document.getElementById(`star-${field}`).querySelectorAll('.star-btn').forEach((b, i) => {
+    b.classList.toggle('active', i < val);
+  });
+}
+
+function openCheckin() {
+  document.getElementById('checkin-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+async function submitCheckin() {
+  await fetch(`/api/employees/${EID}/checkins`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      date: TODAY,
+      belonging: starVals.belonging,
+      confidence: starVals.confidence,
+      inclusion: starVals.inclusion,
+      support: starVals.support,
+      visibility: starVals.visibility,
+      note: document.getElementById('checkin-note').value
+    })
+  });
+  closeModal('checkin-modal');
+  document.getElementById('checkin-card').innerHTML =
+    '<h3 style="color:var(--success)">Check-in saved ✓</h3>' +
+    '<p style="margin-top:6px;font-size:0.875rem;">Your reflection has been saved privately. It will appear in your check-in history below.</p>';
+  init();
+}
+
+function openSupportModal() {
+  document.getElementById('support-modal').classList.add('open');
+  document.getElementById('support-modal-inner').style.display = 'block';
+  document.getElementById('support-confirm').style.display = 'none';
+  document.body.style.overflow = 'hidden';
+}
+
+function submitSupport() {
+  if (!document.getElementById('support-type').value) { alert('Please select a support type.'); return; }
+  document.getElementById('support-modal-inner').style.display = 'none';
+  document.getElementById('support-confirm').style.display = 'block';
+}
+
+async function dismissNudge(id, btn) {
+  await fetch(`/api/nudges/${id}/dismiss`, { method: 'PUT' });
+  btn.closest('.nudge-card').remove();
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => {
+    if (e.target === o) { o.classList.remove('open'); document.body.style.overflow = ''; }
+  });
 });
+
+init();
 </script>
 </body>
 </html>

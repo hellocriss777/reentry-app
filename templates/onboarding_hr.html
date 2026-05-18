@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hearth — HR Setup</title>
+<link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+<div class="onboarding-wrap">
+  <div class="onboarding-card">
+    <span class="onboarding-logo">Hearth</span>
+
+    <div class="step-progress" id="step-progress">
+      <div class="step-dot active" id="dot-1">1</div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step-dot" id="dot-2">2</div>
+      <div class="step-line" id="line-2"></div>
+      <div class="step-dot" id="dot-3">3</div>
+      <div class="step-line" id="line-3"></div>
+      <div class="step-dot" id="dot-4">4</div>
+      <div class="step-line" id="line-4"></div>
+      <div class="step-dot" id="dot-5">5</div>
+      <div class="step-line" id="line-5"></div>
+      <div class="step-dot" id="dot-6">6</div>
+    </div>
+
+    <!-- Step 1: Welcome -->
+    <div class="step-content active" id="step-1">
+      <div class="onboarding-header">
+        <h1>Welcome to Hearth</h1>
+        <p>Hearth is a return-to-work support platform for your organisation. As the HR administrator, you are the starting point. You will set up your organisation's profile, invite returning employees, and assign their managers.</p>
+        <p style="margin-top:10px;font-size:0.875rem;color:var(--text-3);">This should take around 5 minutes to complete.</p>
+      </div>
+      <div class="step-nav">
+        <span></span>
+        <button class="btn btn-pink" onclick="nextStep()">Get started</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Create account -->
+    <div class="step-content" id="step-2">
+      <div class="onboarding-header">
+        <h1>Create your account</h1>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">First name</label>
+        <input class="ob-input" type="text" placeholder="First name"/>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Last name</label>
+        <input class="ob-input" type="text" placeholder="Last name"/>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Work email address</label>
+        <input class="ob-input" type="email" value="hr@techforward.com"/>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Password</label>
+        <input class="ob-input" type="password" placeholder="Minimum 8 characters, include one number"/>
+        <div class="ob-hint">Minimum 8 characters, must include one number.</div>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Confirm password</label>
+        <input class="ob-input" type="password" placeholder="Repeat password"/>
+      </div>
+      <div class="step-nav">
+        <button class="btn btn-outline" onclick="prevStep()">Back</button>
+        <button class="btn btn-pink" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Organisation profile -->
+    <div class="step-content" id="step-3">
+      <div class="onboarding-header">
+        <h1>Tell us about your organisation</h1>
+        <p>This information helps us tailor the platform to your workplace context.</p>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Organisation name</label>
+        <input class="ob-input" type="text" placeholder="Your organisation name"/>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Industry</label>
+        <select class="ob-input ob-select">
+          <option value="">Select industry</option>
+          <option>Technology</option><option>Healthcare</option><option>Finance</option>
+          <option>Education</option><option>Legal</option><option>Government</option>
+          <option>Retail</option><option>Professional Services</option><option>Other</option>
+        </select>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Organisation size</label>
+        <div class="ob-radio-group">
+          <label><input type="radio" name="size" value="under50"/> Under 50 employees</label>
+          <label><input type="radio" name="size" value="50to200"/> 50 to 200 employees</label>
+          <label><input type="radio" name="size" value="201to500"/> 201 to 500 employees</label>
+          <label><input type="radio" name="size" value="500plus"/> 500 or more employees</label>
+        </div>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Primary office location</label>
+        <input class="ob-input" type="text" placeholder="City or region"/>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Does your organisation have a formal return-to-work policy?</label>
+        <div class="ob-radio-group">
+          <label><input type="radio" name="policy" value="yes" onclick="showPolicyUpload(true)"/> Yes</label>
+          <label><input type="radio" name="policy" value="no" onclick="showPolicyUpload(false)"/> No</label>
+          <label><input type="radio" name="policy" value="working" onclick="showPolicyUpload(false)"/> We are working on one</label>
+        </div>
+      </div>
+      <div id="policy-upload" style="display:none;" class="ob-form-group">
+        <label class="ob-label">Upload your return-to-work policy <span class="optional">(optional)</span></label>
+        <div class="ob-upload" onclick="this.querySelector('input').click()">
+          📎 Click to upload a PDF or Word document
+          <input type="file" style="display:none;" accept=".pdf,.doc,.docx"/>
+        </div>
+        <div class="ob-hint">This will be available to returning employees through their resource library.</div>
+      </div>
+      <div class="step-nav">
+        <button class="btn btn-outline" onclick="prevStep()">Back</button>
+        <button class="btn btn-pink" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Platform configuration -->
+    <div class="step-content" id="step-4">
+      <div class="onboarding-header">
+        <h1>Configure Hearth for your organisation</h1>
+        <p>These settings control how Hearth behaves for your team. You can update them at any time from your admin settings.</p>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Default re-entry support window</label>
+        <div class="ob-radio-group">
+          <label><input type="radio" name="window" value="60"/> 60 days</label>
+          <label><input type="radio" name="window" value="90" checked/> 90 days</label>
+          <label><input type="radio" name="window" value="120"/> 120 days</label>
+        </div>
+        <div class="ob-hint">This is how long each returning employee will have access to active support features. After this window closes, their account becomes read-only.</div>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label" style="display:flex;justify-content:space-between;align-items:center;">
+          Allow employees to opt in to a buddy pairing?
+          <input type="checkbox" checked style="width:auto;accent-color:var(--dark);"/>
+        </label>
+        <div class="ob-hint">If enabled, returning employees can request to be paired with a peer buddy within the organisation.</div>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label" style="display:flex;justify-content:space-between;align-items:center;">
+          Allow employees to opt in to a mentor pairing?
+          <input type="checkbox" checked style="width:auto;accent-color:var(--dark);"/>
+        </label>
+        <div class="ob-hint">If enabled, returning employees can request to be paired with a mentor. You will manage these pairings from your dashboard.</div>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Who receives support request alerts?</label>
+        <div class="ob-check-group">
+          <label><input type="checkbox" checked disabled/> HR Administrator (always notified)</label>
+          <label><input type="checkbox"/> Direct Manager</label>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn btn-outline" onclick="prevStep()">Back</button>
+        <button class="btn btn-pink" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 5: Invite first employee -->
+    <div class="step-content" id="step-5">
+      <div class="onboarding-header">
+        <h1>Invite a returning employee</h1>
+        <p>You can invite as many employees as you need. Start with one now and add more from your dashboard at any time.</p>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Employee first name</label>
+        <input class="ob-input" type="text" placeholder="First name"/>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Employee last name</label>
+        <input class="ob-input" type="text" placeholder="Last name"/>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Employee work email</label>
+        <input class="ob-input" type="email" placeholder="employee@company.com"/>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Job title</label>
+        <input class="ob-input" type="text" placeholder="Job title"/>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Department</label>
+        <input class="ob-input" type="text" placeholder="Department"/>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Return to work date</label>
+        <input class="ob-input" type="date"/>
+        <div class="ob-hint">Hearth uses this to set up their 90-day support window.</div>
+      </div>
+      <div class="ob-form-group">
+        <label class="ob-label">Assign a manager</label>
+        <input class="ob-input" type="text" placeholder="Search by name or email"/>
+        <div class="ob-hint">If they are not yet on Hearth, they will receive a separate invite automatically.</div>
+      </div>
+      <div class="step-nav">
+        <button class="btn btn-outline" onclick="prevStep()">Back</button>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+          <button class="btn btn-pink" onclick="nextStep()">Send invite and continue</button>
+          <button class="secondary-link" onclick="nextStep()">Skip for now, I will invite employees from my dashboard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6: All set -->
+    <div class="step-content" id="step-6">
+      <div class="onboarding-header">
+        <h1>Hearth is ready for your organisation</h1>
+        <p>Your organisation profile is set up. Any invites you sent have been delivered. You can manage everything from your dashboard.</p>
+      </div>
+      <div class="ob-summary">
+        <div class="ob-summary-row"><span>Organisation</span><span>TechForward Ltd</span></div>
+        <div class="ob-summary-row"><span>Employees invited</span><span>1</span></div>
+        <div class="ob-summary-row"><span>Support window</span><span>90 days</span></div>
+        <div class="ob-summary-row"><span>Buddy programme</span><span>Enabled</span></div>
+        <div class="ob-summary-row"><span>Mentor programme</span><span>Enabled</span></div>
+      </div>
+      <div class="step-nav">
+        <a href="/" class="btn btn-outline">Back to home</a>
+        <a href="/hr" class="btn btn-pink">Go to my dashboard</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let current = 1;
+const total = 6;
+
+function showStep(n) {
+  document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  for (let i = 1; i <= total; i++) {
+    const dot = document.getElementById('dot-' + i);
+    if (i < n)        { dot.className = 'step-dot done'; dot.textContent = '✓'; }
+    else if (i === n) { dot.className = 'step-dot active'; dot.textContent = i; }
+    else              { dot.className = 'step-dot'; dot.textContent = i; }
+    if (i < total) {
+      document.getElementById('line-' + i).className = 'step-line' + (i < n ? ' done' : '');
+    }
+  }
+  window.scrollTo(0, 0);
+}
+
+function nextStep() { if (current < total) { current++; showStep(current); } }
+function prevStep() { if (current > 1)     { current--; showStep(current); } }
+
+function showPolicyUpload(show) {
+  document.getElementById('policy-upload').style.display = show ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
