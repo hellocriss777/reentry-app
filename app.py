@@ -321,6 +321,7 @@ def reset_demo():
               'manager_notes','manager_feedback','what_changed',
               'checklist_items','checkins','employees','settings']:
         conn.execute(f'DELETE FROM {t}')
+    conn.execute("DELETE FROM sqlite_sequence")
     _seed(conn)
     conn.commit()
     conn.close()

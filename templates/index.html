@@ -7,6 +7,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/static/style.css"/>
+  <style>
+    .emp-pick { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .emp-pick-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-radius: 8px; border: 1.5px solid var(--border);
+      background: var(--white); color: var(--text-primary); cursor: pointer;
+      font-family: inherit; font-size: 0.82rem; text-decoration: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .emp-pick-btn:hover { border-color: var(--primary-light); background: var(--primary-tint); text-decoration: none; }
+    .emp-pick-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-tint); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+    .emp-pick-info { flex: 1; text-align: left; }
+    .emp-pick-name { font-weight: 600; color: var(--primary); }
+    .emp-pick-meta { font-size: 0.72rem; color: var(--text-secondary); }
+    .emp-pick-loading { font-size: 0.82rem; color: var(--text-secondary); padding: 6px 0; }
+  </style>
 </head>
 <body>
   <main class="landing-wrap">
@@ -15,24 +31,25 @@
     <div class="landing-divider"></div>
 
     <div class="role-cards">
+
       <div class="role-card">
         <div class="role-icon">👩‍💼</div>
         <h3>Returning Employee</h3>
         <p>Your personalised support space for your first 90 days back.</p>
-        <div class="role-btns">
-          <a href="/employee?id=1" class="role-btn role-btn-primary">View dashboard</a>
-          <a href="/onboarding/employee" class="role-btn role-btn-outline">View onboarding</a>
+        <div class="emp-pick" id="emp-pick-employee">
+          <div class="emp-pick-loading">Loading employees…</div>
         </div>
+        <a href="/onboarding/employee" class="role-btn role-btn-outline">View onboarding</a>
       </div>
 
       <div class="role-card">
         <div class="role-icon">🧑‍💼</div>
         <h3>Manager</h3>
         <p>Guided actions and prompts to help you support your team member's return.</p>
-        <div class="role-btns">
-          <a href="/manager?employee_id=1" class="role-btn role-btn-primary">View dashboard</a>
-          <a href="/onboarding/manager" class="role-btn role-btn-outline">View onboarding</a>
+        <div class="emp-pick" id="emp-pick-manager">
+          <div class="emp-pick-loading">Loading employees…</div>
         </div>
+        <a href="/onboarding/manager" class="role-btn role-btn-outline">View onboarding</a>
       </div>
 
       <div class="role-card">
@@ -44,24 +61,66 @@
           <a href="/onboarding/hr" class="role-btn role-btn-outline">View onboarding</a>
         </div>
       </div>
+
     </div>
 
     <div class="demo-note">
       <strong>Prototype demo guide</strong>
       <ul>
-        <li>All data is loaded from a local SQLite database. The employee dashboard defaults to Sarah Chen on Day 32.</li>
-        <li>Interactive elements — milestones, modals, wins log, action guide — are functional for demo purposes.</li>
-        <li>Use the buttons below to reset to the full demo dataset or wipe the database.</li>
+        <li>Three demo employees are pre-loaded: Sarah Chen (Day 32), Maya Patel (Day 56), and Jess Thompson (Day 85).</li>
+        <li>Interactive elements — milestones, check-ins, wins log, action guide — are fully connected to the database.</li>
+        <li>Click "Load demo state" to reset to the full demo dataset at any time.</li>
       </ul>
       <div class="demo-actions">
         <button class="btn btn-primary btn-sm" onclick="loadDemo()">Load demo state</button>
         <button class="btn btn-outline btn-sm" onclick="clearData()">Clear all data</button>
       </div>
-      <div id="demo-msg" style="text-align:center;margin-top:10px;font-size:0.82rem;color:var(--success);display:none;"></div>
+      <div id="demo-msg" style="text-align:center;margin-top:10px;font-size:0.82rem;display:none;"></div>
     </div>
   </main>
 
 <script>
+const AVATARS = ['👩‍💼', '👩‍💻', '🔬'];
+
+function dayNum(startDate) {
+  return Math.max(1, Math.floor((new Date() - new Date(startDate)) / 86400000) + 1);
+}
+
+function renderEmployeePickers(employees) {
+  ['employee', 'manager'].forEach(role => {
+    const el = document.getElementById(`emp-pick-${role}`);
+    if (employees.length === 0) {
+      el.innerHTML = '<div class="emp-pick-loading">No employees — click Load demo state.</div>';
+      return;
+    }
+    const href = e => role === 'employee' ? `/employee?id=${e.id}` : `/manager?employee_id=${e.id}`;
+    el.innerHTML = employees.map((e, i) => {
+      const day = dayNum(e.start_date);
+      return `
+        <a href="${href(e)}" class="emp-pick-btn">
+          <div class="emp-pick-avatar">${AVATARS[i] || '👤'}</div>
+          <div class="emp-pick-info">
+            <div class="emp-pick-name">${e.name}</div>
+            <div class="emp-pick-meta">${e.role || ''} · Day ${day}</div>
+          </div>
+        </a>
+      `;
+    }).join('');
+  });
+}
+
+async function loadEmployees() {
+  try {
+    const employees = await fetch('/api/employees').then(r => r.json());
+    renderEmployeePickers(employees);
+  } catch(e) {
+    ['employee', 'manager'].forEach(role => {
+      document.getElementById(`emp-pick-${role}`).innerHTML =
+        '<div class="emp-pick-loading">Could not connect — is the server running?</div>';
+    });
+  }
+}
+
 async function loadDemo() {
   const msg = document.getElementById('demo-msg');
   msg.style.display = 'none';
@@ -71,6 +130,7 @@ async function loadDemo() {
       msg.style.color = 'var(--success)';
       msg.textContent = 'Demo data loaded. All dashboards now reflect the full demo dataset.';
       msg.style.display = 'block';
+      loadEmployees();
     }
   } catch(e) {
     msg.style.color = 'var(--alert)';
@@ -80,15 +140,16 @@ async function loadDemo() {
 }
 
 async function clearData() {
-  if (!confirm('This will delete all employees and data. Are you sure?')) return;
+  if (!confirm('This will wipe all data and reload the demo dataset. Continue?')) return;
   const msg = document.getElementById('demo-msg');
   msg.style.display = 'none';
   try {
     const r = await fetch('/api/reset', { method: 'POST' });
     if (r.ok) {
       msg.style.color = 'var(--alert)';
-      msg.textContent = 'All data cleared and demo reloaded. Use Clear then navigate to a dashboard to see the empty state — or load demo state again.';
+      msg.textContent = 'Data cleared and demo reloaded with fresh IDs.';
       msg.style.display = 'block';
+      loadEmployees();
     }
   } catch(e) {
     msg.style.color = 'var(--alert)';
@@ -96,6 +157,8 @@ async function clearData() {
     msg.style.display = 'block';
   }
 }
+
+loadEmployees();
 </script>
 </body>
 </html>
