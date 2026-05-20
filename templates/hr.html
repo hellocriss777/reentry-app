@@ -96,9 +96,10 @@
     <div class="card" style="margin-bottom:20px;" id="action-plans-section">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <h2>Manager action plans</h2>
-        <span style="font-size:0.75rem;color:var(--text-secondary);">Tasks you assign appear on the manager's dashboard for each employee</span>
+        <span style="font-size:0.75rem;color:var(--text-secondary);">Tasks you assign appear on the manager's dashboard</span>
       </div>
-      <div id="action-plans-list">
+      <div id="ap-emp-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;"></div>
+      <div id="ap-actions">
         <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
       </div>
     </div>
@@ -515,40 +516,70 @@ async function init() {
   }
 }
 
+/* ── Action plans (tab-based employee selector) ────────────────── */
+let apEmployees = [];
+let apActionData = [];
+let apSelectedIdx = 0;
+
 function renderActionPlans(employees, actionData) {
-  const el = document.getElementById('action-plans-list');
-  if (!el) return;
+  apEmployees = employees;
+  apActionData = actionData;
+
+  const tabsEl = document.getElementById('ap-emp-tabs');
+  const actionsEl = document.getElementById('ap-actions');
+
   if (employees.length === 0) {
-    el.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No employees enrolled yet.</p>';
+    tabsEl.innerHTML = '';
+    actionsEl.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No employees enrolled yet.</p>';
     return;
   }
-  el.innerHTML = employees.map((e, i) => {
-    const actions = actionData[i] || [];
-    const done = actions.filter(a => a.done).length;
-    const pending = actions.filter(a => !a.done);
-    return `
-      <div style="padding:14px 0;border-bottom:1px solid var(--border);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
-          <div>
-            <span style="font-weight:600;">${e.name}</span>
-            <span style="color:var(--text-secondary);font-size:0.82rem;"> — Manager: ${e.manager_name || '—'}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:0.75rem;color:var(--text-secondary);">${done}/${actions.length} done</span>
-            <button class="btn btn-primary btn-sm" onclick="openActionModal(${e.id},'${e.name}')">+ Add action</button>
-          </div>
-        </div>
-        ${actions.length === 0
-          ? '<p style="color:var(--text-secondary);font-size:0.82rem;margin:0;">No actions assigned yet.</p>'
-          : actions.slice(0, 4).map(a => `
-              <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:0.82rem;">
-                <span style="flex-shrink:0;color:${a.done ? 'var(--success)' : 'var(--text-secondary)'};">${a.done ? '✓' : '○'}</span>
-                <span style="${a.done ? 'text-decoration:line-through;color:var(--text-secondary);' : ''}">${a.text}</span>
-              </div>`).join('')
-          + (actions.length > 4 ? `<div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;">+${actions.length - 4} more — <a href="/manager?employee_id=${e.id}" style="color:var(--primary-light);">view manager dashboard</a></div>` : '')}
-      </div>
-    `;
+
+  tabsEl.innerHTML = employees.map((e, i) => {
+    const pending = (actionData[i] || []).filter(a => !a.done).length;
+    return `<button
+      class="btn btn-sm${i === 0 ? ' btn-primary' : ' btn-outline'}"
+      id="ap-tab-${i}"
+      onclick="selectApEmployee(${i})"
+      style="border-radius:99px;">
+      ${e.name.split(' ')[0]}${pending > 0 ? ` <span style="background:rgba(255,255,255,0.25);border-radius:99px;padding:0 5px;font-size:0.7rem;">${pending}</span>` : ''}
+    </button>`;
   }).join('');
+
+  apSelectedIdx = 0;
+  renderApActions(0);
+}
+
+function selectApEmployee(idx) {
+  apSelectedIdx = idx;
+  document.querySelectorAll('[id^="ap-tab-"]').forEach((b, i) => {
+    b.className = `btn btn-sm${i === idx ? ' btn-primary' : ' btn-outline'}`;
+    b.style.borderRadius = '99px';
+  });
+  renderApActions(idx);
+}
+
+function renderApActions(idx) {
+  const emp = apEmployees[idx];
+  const actions = apActionData[idx] || [];
+  const done = actions.filter(a => a.done).length;
+  const el = document.getElementById('ap-actions');
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:0.85rem;color:var(--text-secondary);">
+        Manager: <strong>${emp.manager_name || '—'}</strong> &nbsp;·&nbsp; ${done}/${actions.length} done
+      </span>
+      <button class="btn btn-primary btn-sm" onclick="openActionModal(${emp.id},'${emp.name}')">+ Add action</button>
+    </div>
+    ${actions.length === 0
+      ? '<p style="color:var(--text-secondary);font-size:0.875rem;">No actions assigned yet. Add one above.</p>'
+      : actions.map(a => `
+          <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;font-size:0.875rem;border-bottom:1px solid var(--border);">
+            <span style="flex-shrink:0;margin-top:1px;color:${a.done ? 'var(--success)' : 'var(--text-secondary)'};">${a.done ? '✓' : '○'}</span>
+            <span style="flex:1;${a.done ? 'text-decoration:line-through;color:var(--text-secondary);' : ''}">${a.text}</span>
+            <span style="font-size:0.72rem;color:var(--text-secondary);white-space:nowrap;">${a.date || ''}</span>
+          </div>`).join('')
+    }
+  `;
 }
 
 function toggleDropdown(btn) {
@@ -652,12 +683,20 @@ function openActionModal(eid, name) {
 async function sendManagerAction() {
   const text = document.getElementById('action-text').value.trim();
   if (!text || !actionTargetEid) return;
-  await fetch(`/api/employees/${actionTargetEid}/actions`, {
+  const res = await fetch(`/api/employees/${actionTargetEid}/actions`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ date: TODAY, text })
   });
+  const newAction = await res.json();
   closeModal('action-modal');
   document.getElementById('action-text').value = '';
+  // Refresh the tab that was targeted
+  const idx = apEmployees.findIndex(e => e.id === actionTargetEid);
+  if (idx !== -1) {
+    apActionData[idx] = [...(apActionData[idx] || []), newAction];
+    renderActionPlans(apEmployees, apActionData);
+    selectApEmployee(idx);
+  }
 }
 
 async function dismissNudge(id, btn) {

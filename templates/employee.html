@@ -463,7 +463,6 @@ function renderMilestones(items, container, compact) {
             <div class="milestone-label${item.done ? ' done' : ''}">${item.text}</div>
             ${item.done ? '<div class="milestone-meta">Completed</div>' : ''}
           </div>
-          <button class="share-btn${item.done ? ' visible' : ''}" onclick="shareToggle(this)">Share</button>
         </div>
       `).join('')}
     </div>
@@ -480,19 +479,12 @@ function showAllMilestones() {
 async function toggleMilestone(cb, id) {
   const item = cb.closest('.milestone-item');
   const label = item.querySelector('.milestone-label');
-  const shareBtn = item.querySelector('.share-btn');
-  if (cb.checked) { label.classList.add('done'); shareBtn.classList.add('visible'); }
-  else { label.classList.remove('done'); shareBtn.classList.remove('visible'); }
+  if (cb.checked) label.classList.add('done');
+  else label.classList.remove('done');
   await fetch(`/api/checklist/${id}`, {
     method: 'PUT', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ done: cb.checked })
   });
-}
-
-function shareToggle(btn) {
-  if (btn.classList.contains('shared')) return;
-  btn.textContent = 'Shared';
-  btn.classList.add('shared', 'visible');
 }
 
 async function addWin() {

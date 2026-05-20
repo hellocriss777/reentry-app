@@ -257,15 +257,6 @@ tr:hover td { background: var(--primary-tint); }
 }
 .mi-text { flex: 1; font-size: 0.9rem; }
 .milestone-item.done .mi-text { text-decoration: line-through; color: var(--text-secondary); }
-.share-btn {
-  font-size: 0.75rem; padding: 3px 10px; border-radius: 999px;
-  background: var(--primary-tint); color: var(--primary);
-  border: 1px solid var(--border); cursor: pointer;
-  opacity: 0; transition: opacity 0.15s; white-space: nowrap;
-}
-.milestone-item:hover .share-btn,
-.milestone-item .share-btn.visible { opacity: 1; }
-.share-btn.shared { background: var(--success); color: var(--white); border-color: var(--success); }
 
 /* ── Wins log ─────────────────────────────────────────────────── */
 .wins-input-row { display: flex; gap: 8px; margin-bottom: 14px; }
@@ -440,16 +431,6 @@ tr:hover td { background: var(--primary-tint); }
 .resource-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
 .resource-row:last-child { border-bottom: none; }
 .resource-row .resource-actions a { color: var(--primary-light); margin-left: 10px; font-size: 0.8rem; }
-.request-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 8px; background: var(--white); }
-.request-card h4 { font-size: 0.875rem; }
-.request-card .request-meta { font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px; }
-.flag-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--alert); margin-right: 6px; }
-
-/* ── Manager shared panel ─────────────────────────────────────── */
-.shared-panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-.shared-item { padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
-.shared-item:last-child { border-bottom: none; }
-.shared-item .shared-note { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
 
 /* ── Onboarding layout ───────────────────────────────────────── */
 .onboarding-wrap {
