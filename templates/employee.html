@@ -37,7 +37,7 @@
       <a href="#overview-section" class="active" onclick="scrollTo('overview-section',this)">Dashboard</a>
       <a href="#milestones-section" onclick="scrollTo('milestones-section',this)">Milestones</a>
       <a href="#checkins-section" onclick="scrollTo('checkins-section',this)">Check-ins</a>
-      <a href="#wins-section" onclick="scrollTo('wins-section',this)">Wins log</a>
+      <a href="#wins-section" onclick="scrollTo('wins-section',this)">My journal</a>
       <a href="#resources-section" onclick="scrollTo('resources-section',this)">Resources</a>
       <a href="#whats-changed-section" onclick="scrollTo('whats-changed-section',this)">What changed</a>
     </div>
@@ -97,10 +97,10 @@
     <!-- Wins log + Resources -->
     <div class="dash-row dash-row-2" style="margin-bottom:20px;" id="wins-section">
       <div class="card">
-        <h2>Wins log</h2>
-        <p style="font-size:0.8rem;margin-bottom:12px;">A private space to record small wins and moments you are proud of.</p>
+        <h2>My journal</h2>
+        <p style="font-size:0.8rem;margin-bottom:12px;">A private space to note how things are going — big or small.</p>
         <div class="wins-input-row">
-          <input type="text" id="win-input" placeholder="Something went well today…" maxlength="280"/>
+          <input type="text" id="win-input" placeholder="How are things going today…" maxlength="280"/>
           <button class="btn btn-primary btn-sm" onclick="addWin()">Add</button>
         </div>
         <div id="wins-list"><p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p></div>
@@ -221,6 +221,12 @@
       <label>Anything you'd like to note? <span style="font-weight:400;color:var(--text-secondary);">(optional)</span></label>
       <textarea id="checkin-note" placeholder="Take your time…" rows="2"></textarea>
     </div>
+    <div class="checkin-q" style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px;">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-weight:400;">
+        <input type="checkbox" id="checkin-share" style="margin-top:3px;flex-shrink:0;accent-color:var(--primary);">
+        <span>Share my scores with my manager <span style="color:var(--text-secondary);font-weight:400;">(optional — your notes are never shared)</span></span>
+      </label>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('checkin-modal')">Save for later</button>
       <button class="btn btn-primary" onclick="submitCheckin()">Save check-in</button>
@@ -283,13 +289,12 @@ function fmt(dateStr) {
 }
 
 async function init() {
-  const [emp, checklist, diary, msgs, resources, nudges, changes, checkins] = await Promise.all([
+  const [emp, checklist, diary, msgs, resources, changes, checkins] = await Promise.all([
     fetch(`/api/employees/${EID}`).then(r => r.json()),
     fetch(`/api/employees/${EID}/checklist`).then(r => r.json()),
     fetch(`/api/employees/${EID}/diary`).then(r => r.json()),
     fetch(`/api/employees/${EID}/messages`).then(r => r.json()),
     fetch('/api/resources').then(r => r.json()),
-    fetch(`/api/employees/${EID}/nudges`).then(r => r.json()),
     fetch('/api/changes').then(r => r.json()),
     fetch(`/api/employees/${EID}/checkins`).then(r => r.json()),
   ]);
@@ -336,7 +341,7 @@ async function init() {
   // Wins log
   const winsList = document.getElementById('wins-list');
   if (diary.length === 0) {
-    winsList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No wins recorded yet. Add one above — even small things count.</p>';
+    winsList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">Nothing recorded yet. Add a note above — even small things count.</p>';
   } else {
     winsList.innerHTML = diary.slice(0, 5).map(d => `
       <div class="win-entry">
@@ -381,17 +386,6 @@ async function init() {
       nudgesContainer.appendChild(card);
     });
   }
-  nudges.forEach(n => {
-    const card = document.createElement('div');
-    card.className = 'nudge-card';
-    card.style.marginBottom = '16px';
-    card.innerHTML = `
-      <div class="nudge-icon">💡</div>
-      <div class="nudge-body"><p>${n.text}</p></div>
-      <button class="btn btn-ghost btn-sm" onclick="dismissNudge(${n.id}, this)">Dismiss</button>
-    `;
-    nudgesContainer.appendChild(card);
-  });
 
   // Check-in history
   const histEl = document.getElementById('checkin-history');
@@ -516,6 +510,7 @@ function openCheckin() {
 }
 
 async function submitCheckin() {
+  const shared = document.getElementById('checkin-share').checked;
   await fetch(`/api/employees/${EID}/checkins`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -528,10 +523,14 @@ async function submitCheckin() {
       note: document.getElementById('checkin-note').value
     })
   });
+  document.getElementById('checkin-share').checked = false;
   closeModal('checkin-modal');
+  const sharedMsg = shared
+    ? ' Your scores have been shared with your manager.'
+    : ' Your scores are private — only you can see them.';
   document.getElementById('checkin-card').innerHTML =
     '<h3 style="color:var(--success)">Check-in saved ✓</h3>' +
-    '<p style="margin-top:6px;font-size:0.875rem;">Your reflection has been saved privately. It will appear in your check-in history below.</p>';
+    `<p style="margin-top:6px;font-size:0.875rem;">Your reflection has been saved.${sharedMsg}</p>`;
   init();
 }
 
@@ -548,10 +547,6 @@ function submitSupport() {
   document.getElementById('support-confirm').style.display = 'block';
 }
 
-async function dismissNudge(id, btn) {
-  await fetch(`/api/nudges/${id}/dismiss`, { method: 'PUT' });
-  btn.closest('.nudge-card').remove();
-}
 
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
