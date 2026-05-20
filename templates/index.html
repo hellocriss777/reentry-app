@@ -91,16 +91,15 @@ async function loadDemo() {
 }
 
 async function clearData() {
-  if (!confirm('This will delete all employees and data. Are you sure?')) return;
+  if (!confirm('This will delete all employees and data. The dashboards will be empty until you load demo state again. Are you sure?')) return;
   const msg = document.getElementById('demo-msg');
   msg.style.display = 'none';
   try {
-    const r = await fetch('/api/reset', { method: 'POST' });
+    const r = await fetch('/api/clear', { method: 'POST' });
     if (r.ok) {
       msg.style.color = 'var(--alert)';
-      msg.textContent = 'Data cleared and demo reloaded with fresh IDs.';
+      msg.textContent = 'All data cleared. Click "Load demo state" to restore the demo dataset.';
       msg.style.display = 'block';
-      updateLinks();
     }
   } catch(e) {
     msg.style.color = 'var(--alert)';

@@ -327,6 +327,20 @@ def reset_demo():
     conn.close()
     return jsonify({'ok': True})
 
+@app.route('/api/clear', methods=['POST'])
+def clear_data():
+    """Clear all data without reseeding."""
+    from database import open_db
+    conn = open_db()
+    for t in ['diary_entries','bias_nudges','resources','manager_actions',
+              'manager_notes','manager_feedback','what_changed',
+              'checklist_items','checkins','employees','settings']:
+        conn.execute(f'DELETE FROM {t}')
+    conn.execute("DELETE FROM sqlite_sequence")
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True})
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)

@@ -33,9 +33,10 @@
     <div class="sidebar-nav">
       <a href="#" class="active" onclick="setActive(this);return false;">Dashboard</a>
       <a href="#employees-section" onclick="setActive(this);scrollSec('employees-section');return false;">Employees</a>
+      <a href="#action-plans-section" onclick="setActive(this);scrollSec('action-plans-section');return false;">Action plans</a>
       <a href="#pairings-section" onclick="setActive(this);scrollSec('pairings-section');return false;">Pairings</a>
       <a href="#resources-section" onclick="setActive(this);scrollSec('resources-section');return false;">Resources</a>
-      <a href="#changes-section" onclick="setActive(this);scrollSec('changes-section');return false;">What changed</a>
+      <a href="#changes-section" onclick="setActive(this);scrollSec('changes-section');return false;">Announcements</a>
       <a href="#reports-section" onclick="setActive(this);scrollSec('reports-section');return false;">Reports</a>
     </div>
     <div class="sidebar-footer">
@@ -88,6 +89,17 @@
             <tr><td colspan="7" style="color:var(--text-secondary);">Loading…</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Action plans section -->
+    <div class="card" style="margin-bottom:20px;" id="action-plans-section">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h2>Manager action plans</h2>
+        <span style="font-size:0.75rem;color:var(--text-secondary);">Tasks you assign appear on the manager's dashboard for each employee</span>
+      </div>
+      <div id="action-plans-list">
+        <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
       </div>
     </div>
 
@@ -203,19 +215,24 @@
           <h2>Organisation resources</h2>
           <button class="btn btn-primary btn-sm" onclick="openUploadModal()">+ Add resource</button>
         </div>
-        <div id="org-resources-list">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--primary);margin-bottom:8px;">For employees</div>
+        <div id="emp-resources-list" style="margin-bottom:16px;">
+          <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
+        </div>
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--primary);margin-bottom:8px;padding-top:10px;border-top:1px solid var(--border);">For managers</div>
+        <div id="mgr-resources-list">
           <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
         </div>
       </div>
     </div>
 
-    <!-- What changed -->
+    <!-- Organisation announcements -->
     <div class="card" id="changes-section">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <h2>What changed digest</h2>
-        <button class="btn btn-primary btn-sm" onclick="openChangeModal()">+ Add update</button>
+        <h2>Organisation announcements</h2>
+        <button class="btn btn-primary btn-sm" onclick="openChangeModal()">+ Add announcement</button>
       </div>
-      <p style="font-size:0.85rem;margin-bottom:14px;">These updates are shown to all returning employees on their dashboard.</p>
+      <p style="font-size:0.85rem;margin-bottom:14px;">Org-wide updates (policy changes, new systems) shown to all returning employees. Team-specific updates are managed by each manager.</p>
       <div id="changes-list">
         <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
       </div>
@@ -350,10 +367,14 @@ async function init() {
   });
   document.getElementById('stat-closing').textContent = closing.length;
 
-  // Load per-employee checkin data to calculate avg scores
+  // Load per-employee data
   const checkinData = await Promise.all(
     employees.map(e => fetch(`/api/employees/${e.id}/checkins`).then(r => r.json()))
   );
+  const actionData = await Promise.all(
+    employees.map(e => fetch(`/api/employees/${e.id}/actions`).then(r => r.json()))
+  );
+  renderActionPlans(employees, actionData);
 
   // Build employee table
   const tbody = document.getElementById('employees-tbody');
@@ -453,12 +474,12 @@ async function init() {
     `).join('');
   }
 
-  // Resources
-  const resList = document.getElementById('org-resources-list');
-  if (resources.length === 0) {
-    resList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No resources added yet.</p>';
-  } else {
-    resList.innerHTML = resources.map(r => `
+  // Resources — split employee vs manager
+  const empRes = resources.filter(r => !r.category.toLowerCase().startsWith('manager') && !r.category.toLowerCase().startsWith('policy'));
+  const mgrRes = resources.filter(r => r.category.toLowerCase().startsWith('manager') || r.category.toLowerCase().startsWith('policy'));
+
+  function resRowHtml(r) {
+    return `
       <div class="resource-row">
         <div>
           <div style="font-weight:600;font-size:0.875rem;">${r.title}</div>
@@ -468,9 +489,12 @@ async function init() {
           ${r.url && r.url !== '#' ? `<a href="${r.url}" target="_blank">View</a>` : ''}
           <a href="#" onclick="removeResource(${r.id}, this);return false;">Remove</a>
         </div>
-      </div>
-    `).join('');
+      </div>`;
   }
+  document.getElementById('emp-resources-list').innerHTML =
+    empRes.length ? empRes.map(resRowHtml).join('') : '<p style="color:var(--text-secondary);font-size:0.875rem;">No employee resources yet.</p>';
+  document.getElementById('mgr-resources-list').innerHTML =
+    mgrRes.length ? mgrRes.map(resRowHtml).join('') : '<p style="color:var(--text-secondary);font-size:0.875rem;">No manager resources yet.</p>';
 
   // What changed
   const changesList = document.getElementById('changes-list');
@@ -489,6 +513,42 @@ async function init() {
       </div>
     `).join('');
   }
+}
+
+function renderActionPlans(employees, actionData) {
+  const el = document.getElementById('action-plans-list');
+  if (!el) return;
+  if (employees.length === 0) {
+    el.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No employees enrolled yet.</p>';
+    return;
+  }
+  el.innerHTML = employees.map((e, i) => {
+    const actions = actionData[i] || [];
+    const done = actions.filter(a => a.done).length;
+    const pending = actions.filter(a => !a.done);
+    return `
+      <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <span style="font-weight:600;">${e.name}</span>
+            <span style="color:var(--text-secondary);font-size:0.82rem;"> — Manager: ${e.manager_name || '—'}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:0.75rem;color:var(--text-secondary);">${done}/${actions.length} done</span>
+            <button class="btn btn-primary btn-sm" onclick="openActionModal(${e.id},'${e.name}')">+ Add action</button>
+          </div>
+        </div>
+        ${actions.length === 0
+          ? '<p style="color:var(--text-secondary);font-size:0.82rem;margin:0;">No actions assigned yet.</p>'
+          : actions.slice(0, 4).map(a => `
+              <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:0.82rem;">
+                <span style="flex-shrink:0;color:${a.done ? 'var(--success)' : 'var(--text-secondary)'};">${a.done ? '✓' : '○'}</span>
+                <span style="${a.done ? 'text-decoration:line-through;color:var(--text-secondary);' : ''}">${a.text}</span>
+              </div>`).join('')
+          + (actions.length > 4 ? `<div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;">+${actions.length - 4} more — <a href="/manager?employee_id=${e.id}" style="color:var(--primary-light);">view manager dashboard</a></div>` : '')}
+      </div>
+    `;
+  }).join('');
 }
 
 function toggleDropdown(btn) {

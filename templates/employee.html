@@ -34,12 +34,12 @@
       <span class="logo-tagline">Your return-to-work space</span>
     </div>
     <div class="sidebar-nav">
-      <a href="#overview-section" class="active" onclick="scrollTo('overview-section',this)">Dashboard</a>
-      <a href="#milestones-section" onclick="scrollTo('milestones-section',this)">Milestones</a>
-      <a href="#checkins-section" onclick="scrollTo('checkins-section',this)">Check-ins</a>
-      <a href="#wins-section" onclick="scrollTo('wins-section',this)">My journal</a>
-      <a href="#resources-section" onclick="scrollTo('resources-section',this)">Resources</a>
-      <a href="#whats-changed-section" onclick="scrollTo('whats-changed-section',this)">What changed</a>
+      <a href="#overview-section" class="active" onclick="navTo('overview-section',this)">Dashboard</a>
+      <a href="#milestones-section" onclick="navTo('milestones-section',this)">Milestones</a>
+      <a href="#checkins-section" onclick="navTo('checkins-section',this)">Check-ins</a>
+      <a href="#wins-section" onclick="navTo('wins-section',this)">My journal</a>
+      <a href="#resources-section" onclick="navTo('resources-section',this)">Resources</a>
+      <a href="#whats-changed-section" onclick="navTo('whats-changed-section',this)">What changed</a>
     </div>
     <div class="sidebar-footer" id="sidebar-footer">
       Loading… &nbsp;·&nbsp; <a href="/" style="color:rgba(255,255,255,0.5)">Switch role</a>
@@ -70,7 +70,7 @@
     </div>
 
     <!-- Milestones + Check-in prompt -->
-    <div class="dash-row dash-row-2" style="margin-bottom:20px;" id="milestones-section">
+    <div class="dash-row dash-row-2" style="margin-bottom:20px;align-items:start;" id="milestones-section">
 
       <div class="card">
         <div class="phase-label" id="phase-label">Your milestones</div>
@@ -95,7 +95,7 @@
     <div id="nudges-container"></div>
 
     <!-- Wins log + Resources -->
-    <div class="dash-row dash-row-2" style="margin-bottom:20px;" id="wins-section">
+    <div class="dash-row dash-row-2" style="margin-bottom:20px;align-items:start;" id="wins-section">
       <div class="card">
         <h2>My journal</h2>
         <p style="font-size:0.8rem;margin-bottom:12px;">A private space to note how things are going — big or small.</p>
@@ -145,7 +145,7 @@
     <!-- What Changed digest -->
     <div class="card" id="whats-changed-section">
       <h2>What changed while you were away</h2>
-      <p style="font-size:0.85rem;margin-bottom:16px;">Updates from HR on things that have changed since you left.</p>
+      <p style="font-size:0.85rem;margin-bottom:16px;">Updates from your manager and HR on team changes, new tools, process shifts, and org-wide announcements.</p>
       <div id="changes-list"><p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p></div>
     </div>
 
@@ -275,12 +275,21 @@ const TODAY = new Date().toISOString().slice(0, 10);
 let starVals = { belonging: 3, confidence: 3, inclusion: 3, support: 3, visibility: 3 };
 let allChecklist = [];
 
-function scrollTo(id, link) {
+function navTo(id, link) {
   document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
   link.classList.add('active');
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth' });
   return false;
+}
+
+/* ── Resource read tracking (localStorage) ───────────────────── */
+function getReadResources() {
+  try { return JSON.parse(localStorage.getItem('hearth_read_resources') || '[]'); } catch { return []; }
+}
+function markResourceRead(id) {
+  const read = getReadResources();
+  if (!read.includes(id)) { read.push(id); localStorage.setItem('hearth_read_resources', JSON.stringify(read)); }
 }
 
 function fmt(dateStr) {
@@ -351,21 +360,28 @@ async function init() {
     `).join('');
   }
 
-  // Resources — filter to employee-facing
+  // Resources — filter to employee-facing, with read markers
   const empResources = resources.filter(r => !r.category.toLowerCase().startsWith('manager') && !r.category.toLowerCase().startsWith('policy'));
+  const readIds = getReadResources();
   const resList = document.getElementById('resource-list');
   if (empResources.length === 0) {
     resList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No resources added yet.</p>';
   } else {
-    resList.innerHTML = empResources.slice(0, 5).map(r => `
-      <div class="resource-card">
-        <div class="rc-meta">
-          <span class="badge badge-purple">${r.category}</span>
+    resList.innerHTML = empResources.slice(0, 5).map(r => {
+      const isRead = readIds.includes(r.id);
+      return `
+        <div class="resource-card" id="res-${r.id}" style="position:relative;">
+          <div class="rc-meta" style="display:flex;align-items:center;gap:6px;">
+            <span class="badge badge-purple">${r.category}</span>
+            ${!isRead ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--primary);flex-shrink:0;" title="New"></span>` : ''}
+          </div>
+          <h4 style="color:${isRead ? 'var(--text-secondary)' : 'inherit'}">${r.title}</h4>
+          ${r.url && r.url !== '#'
+            ? `<a href="${r.url}" target="_blank" style="font-size:0.8rem;" onclick="markResourceRead(${r.id});document.getElementById('res-${r.id}').querySelector('span[title]')?.remove();document.getElementById('res-${r.id}').querySelector('h4').style.color='';">Open resource →</a>`
+            : ''}
         </div>
-        <h4>${r.title}</h4>
-        ${r.url && r.url !== '#' ? `<a href="${r.url}" target="_blank" style="font-size:0.8rem;">Open resource →</a>` : ''}
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   // Manager nudges (messages)

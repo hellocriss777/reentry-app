@@ -101,13 +101,14 @@
     </div>
 
     <div class="sidebar-nav" id="sidebar-nav">
-      <a href="#sec-overview"   class="active" onclick="scrollTo('sec-overview',this)">Overview</a>
-      <a href="#sec-actions"    onclick="scrollTo('sec-actions',this)">Action plan</a>
-      <a href="#sec-checkins"   onclick="scrollTo('sec-checkins',this)">Check-in scores</a>
-      <a href="#sec-milestones" onclick="scrollTo('sec-milestones',this)">Milestones</a>
-      <a href="#sec-notes"      onclick="scrollTo('sec-notes',this)">Private notes</a>
-      <a href="#sec-nudge"      onclick="scrollTo('sec-nudge',this)">Send nudge</a>
-      <a href="#sec-resources"  onclick="scrollTo('sec-resources',this)">Resources</a>
+      <a href="#sec-overview"   class="active" onclick="navTo('sec-overview',this)">Overview</a>
+      <a href="#sec-actions"    onclick="navTo('sec-actions',this)">Action plan</a>
+      <a href="#sec-checkins"   onclick="navTo('sec-checkins',this)">Check-in scores</a>
+      <a href="#sec-milestones" onclick="navTo('sec-milestones',this)">Milestones</a>
+      <a href="#sec-notes"      onclick="navTo('sec-notes',this)">Private notes</a>
+      <a href="#sec-nudge"      onclick="navTo('sec-nudge',this)">Send nudge</a>
+      <a href="#sec-resources"  onclick="navTo('sec-resources',this)">Resources</a>
+      <a href="#sec-team-updates" onclick="navTo('sec-team-updates',this)">Team updates</a>
     </div>
 
     <div class="sidebar-footer">
@@ -163,9 +164,13 @@
     <section id="sec-actions" style="margin-bottom:20px;">
       <div class="section-heading">Action plan</div>
       <div class="card">
-        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">HR has assigned these actions. Mark each one done as you complete it.</p>
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Your checklist for supporting this employee's return. HR assigns actions, and you can add your own tasks here too.</p>
         <div id="action-list">
           <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+          <input type="text" id="mgr-action-input" placeholder="Add your own action…" style="flex:1;"/>
+          <button class="btn btn-primary btn-sm" onclick="addManagerOwnAction()">Add</button>
         </div>
       </div>
     </section>
@@ -210,14 +215,29 @@
 
     <!-- Section: Milestones ────────────────────────────────────── -->
     <section id="sec-milestones" style="margin-bottom:20px;">
-      <div class="section-heading">Shared milestones</div>
+      <div class="section-heading">Milestones</div>
       <div class="card">
         <div style="display:flex;align-items:center;gap:6px;background:#f5f3ff;border-radius:8px;padding:7px 10px;margin-bottom:10px;font-size:0.78rem;color:#5b21b6;">
           <span>🔒</span><span>Employee has chosen to share their milestone progress with you.</span>
         </div>
-        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Milestones the employee has marked complete. You can follow up on these directly.</p>
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">HR sets the default milestones when the employee is enrolled. You can push additional ones below — they appear on the employee's checklist.</p>
         <div id="milestone-list">
           <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
+        </div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+          <div style="font-size:0.8rem;font-weight:600;color:var(--text);margin-bottom:8px;">Push a new milestone to employee</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="ms-week" style="width:100px;flex-shrink:0;">
+              <option value="1">Week 1</option>
+              <option value="2">Week 2</option>
+              <option value="3" selected>Week 3</option>
+              <option value="4">Week 4</option>
+              <option value="6">Week 6</option>
+              <option value="8">Week 8</option>
+            </select>
+            <input type="text" id="ms-text" placeholder="Milestone description…" style="flex:1;min-width:180px;"/>
+            <button class="btn btn-primary btn-sm" onclick="pushMilestone()">Push</button>
+          </div>
         </div>
       </div>
     </section>
@@ -282,6 +302,45 @@
       </div>
     </section>
 
+    <!-- Section: Team updates ───────────────────────────────────── -->
+    <section id="sec-team-updates" style="margin-bottom:20px;">
+      <div class="section-heading">Team updates</div>
+      <div class="dash-row dash-row-2">
+
+        <div class="card">
+          <h2 style="margin-bottom:4px;">Post a team update</h2>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">These updates appear on the employee's dashboard so they stay in the loop on team changes — new tools, new people, process shifts.</p>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="tu-category">
+              <option>Team</option>
+              <option>Process</option>
+              <option>Tools</option>
+              <option>People</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="tu-title" placeholder="e.g. Two new engineers joined the team"/>
+          </div>
+          <div class="form-group">
+            <label>Details <span style="font-weight:400;color:var(--text-secondary);">(optional)</span></label>
+            <textarea id="tu-body" rows="2" placeholder="A brief note for the returning employee…"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="addTeamUpdate()">Post update</button>
+          <div id="tu-confirm" style="display:none;margin-top:10px;font-size:0.82rem;color:var(--success);">Update posted ✓ — visible on employee dashboard.</div>
+        </div>
+
+        <div class="card">
+          <h2 style="margin-bottom:14px;">Posted updates</h2>
+          <div id="team-updates-list">
+            <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -302,9 +361,10 @@ let EID = parseInt(params.get('employee_id') || '1');
 const TODAY = new Date().toISOString().slice(0, 10);
 let allEmployees = [];
 let currentActions = [];
+let currentChanges = [];
 
 /* ── Sidebar scroll nav ─────────────────────────────────────────── */
-function scrollTo(id, link) {
+function navTo(id, link) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   setActive(link);
   return false;
@@ -369,7 +429,7 @@ async function init() {
 }
 
 async function loadEmployee() {
-  const [emp, actions, checkins, checklist, notes, messages, resources] = await Promise.all([
+  const [emp, actions, checkins, checklist, notes, messages, resources, changes] = await Promise.all([
     fetch(`/api/employees/${EID}`).then(r => r.json()),
     fetch(`/api/employees/${EID}/actions`).then(r => r.json()),
     fetch(`/api/employees/${EID}/checkins`).then(r => r.json()),
@@ -377,6 +437,7 @@ async function loadEmployee() {
     fetch(`/api/employees/${EID}/notes`).then(r => r.json()),
     fetch(`/api/employees/${EID}/messages`).then(r => r.json()),
     fetch('/api/resources').then(r => r.json()),
+    fetch('/api/changes').then(r => r.json()),
   ]);
   currentActions = actions;
 
@@ -433,6 +494,9 @@ async function loadEmployee() {
 
   // Resources
   renderResources(resources);
+
+  // Team updates
+  renderTeamUpdates(changes);
 }
 
 /* ── Render: next action ─────────────────────────────────────────── */
@@ -720,6 +784,94 @@ function renderResources(resources) {
       ${r.url ? `<a href="${r.url}" target="_blank" class="btn btn-sm" style="background:var(--primary-tint);color:var(--primary);border:1px solid var(--primary-light);flex-shrink:0;">Open</a>` : ''}
     </div>
   `).join('');
+}
+
+/* ── Manager own action ──────────────────────────────────────────── */
+async function addManagerOwnAction() {
+  const input = document.getElementById('mgr-action-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const res = await fetch(`/api/employees/${EID}/actions`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ date: TODAY, text })
+  });
+  const action = await res.json();
+  input.value = '';
+  currentActions.push(action);
+  renderActions(currentActions);
+  const empIdx = allEmployees.findIndex(e => e.id === EID);
+  const emp = allEmployees[empIdx] || {};
+  const startDate = emp.start_date ? new Date(emp.start_date) : new Date();
+  const dayNum = Math.max(1, Math.floor((new Date() - startDate) / 86400000) + 1);
+  renderNextAction(currentActions, dayNum, phaseInfo(dayNum));
+  document.getElementById('stat-actions-done').textContent =
+    `${currentActions.filter(a => a.done).length}/${currentActions.length}`;
+}
+
+/* ── Push milestone to employee ──────────────────────────────────── */
+async function pushMilestone() {
+  const textInput = document.getElementById('ms-text');
+  const weekInput = document.getElementById('ms-week');
+  const text = textInput.value.trim();
+  if (!text) return;
+  const week = parseInt(weekInput.value);
+  await fetch(`/api/employees/${EID}/checklist`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ week, text, addedBy: 'manager' })
+  });
+  textInput.value = '';
+  const checklist = await fetch(`/api/employees/${EID}/checklist`).then(r => r.json());
+  renderMilestones(checklist);
+  document.getElementById('stat-milestones').textContent =
+    `${checklist.filter(i => i.done).length}/${checklist.length}`;
+}
+
+/* ── Team updates ────────────────────────────────────────────────── */
+function renderTeamUpdates(changes) {
+  currentChanges = changes;
+  const el = document.getElementById('team-updates-list');
+  if (!el) return;
+  if (changes.length === 0) {
+    el.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No team updates posted yet.</p>';
+    return;
+  }
+  el.innerHTML = changes.map(c => `
+    <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+      <div>
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--primary-light);margin-bottom:2px;">${c.category}</div>
+        <div style="font-weight:600;font-size:0.875rem;">${c.title}</div>
+        ${c.body ? `<div style="color:var(--text-secondary);font-size:0.82rem;margin-top:2px;">${c.body}</div>` : ''}
+        <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:3px;">${c.date}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="flex-shrink:0;" onclick="deleteTeamUpdate(${c.id}, this)">Remove</button>
+    </div>
+  `).join('');
+}
+
+async function addTeamUpdate() {
+  const title = document.getElementById('tu-title').value.trim();
+  const category = document.getElementById('tu-category').value;
+  const body = document.getElementById('tu-body').value.trim();
+  if (!title) { alert('Please enter a title.'); return; }
+  const res = await fetch('/api/changes', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, category, body, date: TODAY })
+  });
+  const change = await res.json();
+  document.getElementById('tu-title').value = '';
+  document.getElementById('tu-body').value = '';
+  currentChanges = [change, ...currentChanges];
+  renderTeamUpdates(currentChanges);
+  const confirm = document.getElementById('tu-confirm');
+  confirm.style.display = 'block';
+  setTimeout(() => { confirm.style.display = 'none'; }, 3000);
+}
+
+async function deleteTeamUpdate(id, btn) {
+  if (!confirm('Remove this update? It will no longer appear on the employee dashboard.')) return;
+  await fetch(`/api/changes/${id}`, { method: 'DELETE' });
+  currentChanges = currentChanges.filter(c => c.id !== id);
+  renderTeamUpdates(currentChanges);
 }
 
 /* ── Modal close on backdrop ─────────────────────────────────────── */
