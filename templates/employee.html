@@ -27,6 +27,14 @@
   </style>
 </head>
 <body>
+<div class="mobile-header">
+  <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <span class="mobile-logo-text">Hearth</span>
+  <span class="mobile-role-tag">My space</span>
+</div>
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
 <div class="app-layout">
   <nav class="sidebar">
     <div class="sidebar-logo">
@@ -280,7 +288,22 @@ function navTo(id, link) {
   link.classList.add('active');
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth' });
+  if (window.innerWidth <= 768) closeSidebar();
   return false;
+}
+
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (sidebar.classList.contains('open')) { closeSidebar(); return; }
+  sidebar.classList.add('open');
+  backdrop.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-backdrop').classList.remove('visible');
+  document.body.style.overflow = '';
 }
 
 /* ── Resource read tracking (localStorage) ───────────────────── */

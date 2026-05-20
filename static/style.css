@@ -499,17 +499,71 @@ tr:hover td { background: var(--primary-tint); }
   margin-bottom: 20px; font-size: 0.9rem; color: var(--alert); font-weight: 600;
 }
 
+/* ── Mobile header & hamburger drawer ────────────────────────── */
+.mobile-header {
+  display: none; position: fixed;
+  top: 0; left: 0; right: 0; height: 52px;
+  background: var(--primary); z-index: 200;
+  align-items: center; padding: 0 14px; gap: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.hamburger-btn {
+  background: none; border: none; color: white; cursor: pointer;
+  padding: 7px 6px; display: flex; flex-direction: column; gap: 5px;
+  border-radius: 6px; flex-shrink: 0;
+}
+.hamburger-btn:hover { background: rgba(255,255,255,0.1); }
+.hamburger-btn span {
+  display: block; width: 22px; height: 2px;
+  background: white; border-radius: 2px;
+}
+.mobile-logo-text {
+  font-size: 1.05rem; font-weight: 800;
+  color: white; letter-spacing: -0.5px; flex: 1;
+}
+.mobile-role-tag {
+  font-size: 0.7rem; color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 999px; padding: 2px 9px; white-space: nowrap;
+}
+.sidebar-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4); z-index: 150;
+}
+.sidebar-backdrop.visible { display: block; }
+
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .sidebar { position: relative; width: 100%; flex-direction: row; height: auto; bottom: auto; }
-  .sidebar-nav { flex-direction: row; padding: 8px; overflow-x: auto; }
-  .sidebar-nav a { padding: 8px 12px; }
-  .sidebar-logo .logo-tagline { display: none; }
-  .sidebar-footer { display: none; }
+  .mobile-header { display: flex; }
+
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: min(280px, 85vw); height: 100%;
+    transform: translateX(-110%);
+    transition: transform 0.25s ease;
+    z-index: 175; flex-direction: column; overflow: hidden;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-logo { display: block; }
+  .sidebar-logo .logo-tagline { display: block; }
+  .sidebar-nav {
+    flex-direction: column; padding: 12px 0;
+    gap: 2px; overflow-y: auto; flex: 1;
+  }
+  .sidebar-nav a { padding: 11px 20px; font-size: 0.9rem; }
+  .sidebar-footer { display: block; }
+
   .app-layout { flex-direction: column; }
-  .main-content { margin-left: 0; padding: 16px; }
+  .main-content {
+    margin-left: 0; max-width: 100%;
+    padding: calc(52px + 20px) 16px 20px;
+  }
   .dash-row-2, .dash-row-3, .dash-row-4 { grid-template-columns: 1fr; }
   .col-span-2 { grid-column: span 1; }
   .role-cards { grid-template-columns: 1fr; }
   .onboarding-card { padding: 24px 16px; }
+  .table-wrap { overflow-x: auto; }
+  .emp-header-card { flex-wrap: wrap; }
+  .window-progress { max-width: 100% !important; }
+  .dim-grid { grid-template-columns: repeat(3, 1fr); }
 }

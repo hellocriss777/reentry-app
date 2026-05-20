@@ -90,6 +90,14 @@
   </style>
 </head>
 <body>
+<div class="mobile-header">
+  <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <span class="mobile-logo-text">Hearth</span>
+  <span class="mobile-role-tag">Manager</span>
+</div>
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
 <div class="app-layout">
 
   <!-- ── Sidebar ─────────────────────────────────────────────────── -->
@@ -371,11 +379,25 @@ let currentChanges = [];
 function navTo(id, link) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   setActive(link);
+  if (window.innerWidth <= 768) closeSidebar();
   return false;
 }
 function setActive(link) {
   document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
   link.classList.add('active');
+}
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (sidebar.classList.contains('open')) { closeSidebar(); return; }
+  sidebar.classList.add('open');
+  backdrop.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-backdrop').classList.remove('visible');
+  document.body.style.overflow = '';
 }
 
 /* ── Employee switcher ───────────────────────────────────────────── */
