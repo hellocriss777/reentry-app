@@ -103,18 +103,16 @@
     <div id="nudges-container"></div>
 
     <!-- Wins log + Resources -->
-    <div class="dash-row dash-row-2" style="margin-bottom:20px;align-items:start;" id="wins-section">
-      <div class="card" style="min-width:0;">
+    <div class="dash-row dash-row-2" style="margin-bottom:20px;align-items:stretch;" id="wins-section">
+      <div class="card" style="min-width:0;display:flex;flex-direction:column;">
         <h2>My journal</h2>
         <p style="font-size:0.8rem;margin-bottom:12px;">A private space to note how things are going. Toggle "Share" on any entry to let your manager see it.</p>
         <div class="wins-input-row">
           <input type="text" id="win-input" placeholder="How are things going today…" maxlength="280"/>
           <button class="btn btn-primary btn-sm" onclick="addWin()">Add</button>
         </div>
-        <div id="wins-list"><p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p></div>
-        <div id="wins-more" style="display:none;margin-top:8px;">
-          <a href="#" class="panel-link" onclick="showMoreJournal();return false;" id="wins-more-link">View more →</a>
-        </div>
+        <div id="wins-list" style="flex:1;overflow-y:auto;max-height:300px;margin-top:4px;"><p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p></div>
+        <div id="wins-more" style="display:none;"></div>
       </div>
 
       <div class="card" id="resources-section" style="min-width:0;">
@@ -513,29 +511,14 @@ async function toggleMilestone(cb, id) {
 
 let allDiary = [];
 
-function renderJournal(diary, showAll) {
+function renderJournal(diary) {
   allDiary = diary;
   const list = document.getElementById('wins-list');
-  const moreEl = document.getElementById('wins-more');
-  const moreLink = document.getElementById('wins-more-link');
   if (diary.length === 0) {
     list.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">Nothing recorded yet. Add a note above — even small things count.</p>';
-    moreEl.style.display = 'none';
     return;
   }
-  const visible = showAll ? diary : diary.slice(0, 3);
-  list.innerHTML = visible.map(d => winEntryHtml(d)).join('');
-  if (!showAll && diary.length > 3) {
-    moreEl.style.display = 'block';
-    moreLink.textContent = `View all ${diary.length} entries →`;
-    moreLink.onclick = function(e) { e.preventDefault(); renderJournal(allDiary, true); };
-  } else if (showAll && diary.length > 3) {
-    moreEl.style.display = 'block';
-    moreLink.textContent = 'Show less ↑';
-    moreLink.onclick = function(e) { e.preventDefault(); renderJournal(allDiary, false); };
-  } else {
-    moreEl.style.display = 'none';
-  }
+  list.innerHTML = diary.map(d => winEntryHtml(d)).join('');
 }
 
 function winEntryHtml(d) {
@@ -555,7 +538,7 @@ function winEntryHtml(d) {
 }
 
 function showMoreJournal() {
-  renderJournal(allDiary, true);
+  renderJournal(allDiary);
 }
 
 async function toggleShare(id, btn) {
