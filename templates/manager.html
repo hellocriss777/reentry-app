@@ -116,6 +116,7 @@
       <a href="#sec-overview"   class="active" onclick="navTo('sec-overview',this)">Overview</a>
       <a href="#sec-actions"    onclick="navTo('sec-actions',this)">Action plan</a>
       <a href="#sec-checkins"   onclick="navTo('sec-checkins',this)">Check-in scores</a>
+      <a href="#sec-journal"    onclick="navTo('sec-journal',this)">Shared journal</a>
       <a href="#sec-milestones" onclick="navTo('sec-milestones',this)">Milestones</a>
       <a href="#sec-notes"      onclick="navTo('sec-notes',this)">Private notes</a>
       <a href="#sec-nudge"      onclick="navTo('sec-nudge',this)">Send nudge</a>
@@ -222,6 +223,19 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- Section: Shared journal ────────────────────────────────── -->
+    <section id="sec-journal" style="margin-bottom:20px;">
+      <div class="section-heading">Shared journal</div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:6px;background:#f5f3ff;border-radius:8px;padding:7px 10px;margin-bottom:12px;font-size:0.78rem;color:#5b21b6;">
+          <span>👁</span><span>The employee chose to share these entries with you. Private entries are never shown here.</span>
+        </div>
+        <div id="shared-journal-list">
+          <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
+        </div>
       </div>
     </section>
 
@@ -455,7 +469,7 @@ async function init() {
 }
 
 async function loadEmployee() {
-  const [emp, actions, checkins, checklist, notes, messages, resources, changes] = await Promise.all([
+  const [emp, actions, checkins, checklist, notes, messages, resources, changes, sharedDiary] = await Promise.all([
     fetch(`/api/employees/${EID}`).then(r => r.json()),
     fetch(`/api/employees/${EID}/actions`).then(r => r.json()),
     fetch(`/api/employees/${EID}/checkins`).then(r => r.json()),
@@ -464,6 +478,7 @@ async function loadEmployee() {
     fetch(`/api/employees/${EID}/messages`).then(r => r.json()),
     fetch('/api/resources').then(r => r.json()),
     fetch('/api/changes').then(r => r.json()),
+    fetch(`/api/employees/${EID}/diary/shared`).then(r => r.json()),
   ]);
   currentActions = actions;
 
@@ -523,6 +538,9 @@ async function loadEmployee() {
 
   // Team updates
   renderTeamUpdates(changes);
+
+  // Shared journal
+  renderSharedJournal(sharedDiary);
 }
 
 /* ── Render: next action ─────────────────────────────────────────── */
@@ -668,6 +686,21 @@ function renderCheckinTrend(checkins) {
       </div>
     `;
   }).join('');
+}
+
+/* ── Render: shared journal ──────────────────────────────────────── */
+function renderSharedJournal(entries) {
+  const el = document.getElementById('shared-journal-list');
+  if (entries.length === 0) {
+    el.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No entries shared yet. The employee can share individual journal entries using the 👁 icon on their dashboard.</p>';
+    return;
+  }
+  el.innerHTML = entries.map(d => `
+    <div style="padding:10px 14px;background:var(--primary-tint);border-radius:8px;margin-bottom:8px;">
+      <div style="font-size:0.875rem;">${d.text}</div>
+      <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:4px;">${fmt(d.date)}</div>
+    </div>
+  `).join('');
 }
 
 /* ── Render: milestones ──────────────────────────────────────────── */

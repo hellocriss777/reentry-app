@@ -6,6 +6,19 @@ app = Flask(__name__, static_folder='static', template_folder='templates')
 
 init_db()
 
+# Safe migration: add shared column to diary_entries if it doesn't exist
+def _migrate():
+    from database import open_db
+    conn = open_db()
+    try:
+        conn.execute('ALTER TABLE diary_entries ADD COLUMN shared INTEGER DEFAULT 0')
+        conn.commit()
+    except Exception:
+        pass  # column already exists
+    conn.close()
+
+_migrate()
+
 @app.teardown_appcontext
 def close_db(err):
     db = g.pop('db', None)
@@ -289,6 +302,25 @@ def add_diary(eid):
     )
     db.commit()
     return jsonify(dict(db.execute('SELECT * FROM diary_entries WHERE id=?', (cur.lastrowid,)).fetchone())), 201
+
+@app.route('/api/diary/<int:did>/toggle-share', methods=['PUT'])
+def toggle_diary_share(did):
+    db = get_db()
+    row = db.execute('SELECT shared FROM diary_entries WHERE id=?', (did,)).fetchone()
+    if not row:
+        return jsonify({'error': 'not found'}), 404
+    new_val = 0 if row['shared'] else 1
+    db.execute('UPDATE diary_entries SET shared=? WHERE id=?', (new_val, did))
+    db.commit()
+    return jsonify({'id': did, 'shared': new_val})
+
+@app.route('/api/employees/<int:eid>/diary/shared', methods=['GET'])
+def get_shared_diary(eid):
+    rows = get_db().execute(
+        'SELECT * FROM diary_entries WHERE employee_id=? AND shared=1 ORDER BY id DESC',
+        (eid,)
+    ).fetchall()
+    return jsonify([dict(r) for r in rows])
 
 # ── Stats (HR) ─────────────────────────────────────────────────────────────
 

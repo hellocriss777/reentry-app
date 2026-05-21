@@ -75,6 +75,15 @@
       </div>
     </div>
 
+    <!-- Bias nudges alert panel — compact, above employees -->
+    <div id="nudges-panel" style="margin-bottom:16px;display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+        <span style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#92400e;">⚠ Bias alerts</span>
+        <span id="nudges-alert-text" style="font-size:0.78rem;color:var(--text-secondary);"></span>
+      </div>
+      <div id="nudges-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+
     <!-- Employees table -->
     <div class="card" style="margin-bottom:20px;" id="employees-section">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
@@ -111,15 +120,6 @@
       <div id="ap-actions">
         <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
       </div>
-    </div>
-
-    <!-- Bias nudges alert panel -->
-    <div id="nudges-panel" style="margin-bottom:20px;display:none;">
-      <div class="alert-banner">
-        <span>⚠</span>
-        <span id="nudges-alert-text">Bias nudges require your attention.</span>
-      </div>
-      <div id="nudges-list" style="display:flex;flex-direction:column;gap:10px;"></div>
     </div>
 
     <!-- Reports -->
@@ -371,6 +371,16 @@
   </div>
 </div>
 
+<!-- Employee detail modal -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal" style="position:relative;width:min(620px,94vw);max-height:85vh;overflow-y:auto;">
+    <button class="modal-close" onclick="closeModal('detail-modal')">×</button>
+    <div id="detail-modal-body">
+      <p style="color:var(--text-secondary);">Loading…</p>
+    </div>
+  </div>
+</div>
+
 <!-- Manager action modal -->
 <div class="modal-overlay" id="action-modal">
   <div class="modal" style="position:relative;width:min(540px,92vw);">
@@ -507,8 +517,7 @@ async function init() {
             <div class="actions-dropdown">
               <button class="btn btn-ghost btn-sm" onclick="toggleDropdown(this)">Actions ▾</button>
               <div class="dropdown-menu">
-                <a href="/employee?id=${e.id}">View employee dashboard</a>
-                <a href="/manager?employee_id=${e.id}">View manager dashboard</a>
+                <a href="#" onclick="openDetailModal(${e.id});return false;">View details</a>
                 <a href="#" onclick="openActionModal(${e.id},'${e.name}');return false;">Send manager action</a>
                 <a href="#" style="color:var(--alert);" onclick="return false;">Archive</a>
               </div>
@@ -550,24 +559,25 @@ async function init() {
     }).join('');
   }
 
-  // Bias nudges
+  // Bias nudges — compact inline style
   const nudgeData = await Promise.all(
     employees.map(e => fetch(`/api/employees/${e.id}/nudges`).then(r => r.json()))
   );
   const allNudges = nudgeData.flatMap((ns, i) => ns.map(n => ({ ...n, empName: employees[i].name, empId: employees[i].id })));
+  const nudgesPanel = document.getElementById('nudges-panel');
   if (allNudges.length > 0) {
-    document.getElementById('nudges-panel').style.display = 'block';
+    nudgesPanel.style.display = 'block';
     document.getElementById('nudges-alert-text').textContent =
-      `${allNudges.length} bias nudge${allNudges.length > 1 ? 's' : ''} need your attention.`;
+      `${allNudges.length} alert${allNudges.length > 1 ? 's' : ''} need your attention`;
     document.getElementById('nudges-list').innerHTML = allNudges.map(n => `
-      <div class="nudge-card" style="margin-bottom:8px;">
-        <div class="nudge-icon">⚠️</div>
-        <div class="nudge-body">
-          <p><strong>${n.empName}:</strong> ${n.text}</p>
-        </div>
-        <button class="btn btn-ghost btn-sm" onclick="dismissNudge(${n.id}, this)">Dismiss</button>
+      <div id="nudge-row-${n.id}" style="display:flex;align-items:center;gap:10px;padding:7px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:0.83rem;">
+        <span style="color:#92400e;font-weight:700;flex-shrink:0;">${n.empName}</span>
+        <span style="flex:1;color:#78350f;">${n.text}</span>
+        <button class="btn btn-ghost btn-sm" style="flex-shrink:0;font-size:0.75rem;padding:2px 8px;" onclick="dismissNudge(${n.id}, this)">Dismiss</button>
       </div>
     `).join('');
+  } else {
+    nudgesPanel.style.display = 'none';
   }
 
   // Resources — split employee vs manager
@@ -768,6 +778,125 @@ async function deleteChange(id, btn) {
   btn.closest('.change-item').remove();
 }
 
+async function openDetailModal(eid) {
+  document.getElementById('detail-modal-body').innerHTML = '<p style="color:var(--text-secondary);">Loading…</p>';
+  document.getElementById('detail-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  const [emp, checklist, checkins, sharedDiary] = await Promise.all([
+    fetch(`/api/employees/${eid}`).then(r => r.json()),
+    fetch(`/api/employees/${eid}/checklist`).then(r => r.json()),
+    fetch(`/api/employees/${eid}/checkins`).then(r => r.json()),
+    fetch(`/api/employees/${eid}/diary/shared`).then(r => r.json()),
+  ]);
+
+  const now = new Date();
+  const start = emp.start_date ? new Date(emp.start_date) : now;
+  const day = Math.max(1, Math.floor((now - start) / 86400000) + 1);
+  const phase = day <= 14 ? 'Phase 1' : day <= 30 ? 'Phase 2' : 'Phase 3';
+  const close = new Date(start); close.setDate(close.getDate() + 90);
+  const pct = Math.min(100, Math.round(day / 90 * 100));
+
+  const done = checklist.filter(i => i.done);
+  const pending = checklist.filter(i => !i.done);
+
+  const latestCheckin = checkins.length ? checkins[checkins.length - 1] : null;
+  const avgScore = latestCheckin
+    ? ((latestCheckin.belonging + latestCheckin.confidence + latestCheckin.inclusion + latestCheckin.support + latestCheckin.visibility) / 5).toFixed(1)
+    : null;
+
+  const empIdx = allEmployees.findIndex(e => e.id === eid);
+  const avatars = ['👩‍💼','👩‍💻','🔬'];
+  const avatar = avatars[empIdx] || '👤';
+
+  const fmtD = d => new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  document.getElementById('detail-modal-body').innerHTML = `
+    <!-- Header -->
+    <div style="background:linear-gradient(120deg,var(--primary),var(--primary-light));border-radius:10px;padding:20px 22px;color:#fff;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">${avatar}</div>
+        <div style="flex:1;">
+          <div style="font-size:1.1rem;font-weight:700;">${emp.name}</div>
+          <div style="font-size:0.78rem;opacity:.75;">Day ${day} of 90 · ${emp.role || '—'} · ${phase}</div>
+          <div style="font-size:0.75rem;opacity:.6;margin-top:2px;">Manager: ${emp.manager_name || '—'} · Window closes ${fmtD(close)}</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="height:5px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:rgba(255,255,255,.8);border-radius:99px;"></div>
+        </div>
+        <div style="font-size:0.72rem;opacity:.6;margin-top:4px;">${pct}% of support window complete</div>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+      <div class="stat-chip" style="flex:1;min-width:100px;">
+        <div class="stat-num" style="font-size:1.1rem;">${done.length}/${checklist.length}</div>
+        <div class="stat-label">Milestones done</div>
+      </div>
+      <div class="stat-chip" style="flex:1;min-width:100px;">
+        <div class="stat-num" style="font-size:1.1rem;">${checkins.length}</div>
+        <div class="stat-label">Check-ins</div>
+      </div>
+      <div class="stat-chip" style="flex:1;min-width:100px;">
+        <div class="stat-num" style="font-size:1.1rem;color:${avgScore ? (avgScore >= 4 ? 'var(--success)' : avgScore >= 3 ? 'var(--primary)' : 'var(--alert)') : 'var(--text-secondary)'};">${avgScore ? avgScore + '/5' : '—'}</div>
+        <div class="stat-label">Latest wellbeing</div>
+      </div>
+      <div class="stat-chip" style="flex:1;min-width:100px;">
+        <div class="stat-num" style="font-size:1.1rem;">${sharedDiary.length}</div>
+        <div class="stat-label">Shared journal entries</div>
+      </div>
+    </div>
+
+    <!-- Milestones -->
+    <div style="margin-bottom:18px;">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:8px;">Recent milestones</div>
+      ${done.length === 0 && pending.length === 0
+        ? '<p style="font-size:0.85rem;color:var(--text-secondary);">No milestones yet.</p>'
+        : `
+          ${done.slice(-3).map(i => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:0.85rem;border-bottom:1px solid var(--border);">
+            <span style="color:var(--success);">✓</span>
+            <span style="flex:1;">${i.text}</span>
+            <span style="font-size:0.72rem;color:var(--text-secondary);">Wk ${i.week}</span>
+          </div>`).join('')}
+          ${pending.slice(0, 2).map(i => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:0.85rem;border-bottom:1px solid var(--border);">
+            <span style="color:var(--border);">○</span>
+            <span style="flex:1;color:var(--text-secondary);">${i.text}</span>
+            <span style="font-size:0.72rem;color:var(--text-secondary);">Wk ${i.week}</span>
+          </div>`).join('')}
+        `
+      }
+    </div>
+
+    <!-- Shared journal -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:8px;">Shared journal entries 👁</div>
+      ${sharedDiary.length === 0
+        ? '<p style="font-size:0.85rem;color:var(--text-secondary);">No entries shared yet — the employee controls what they share.</p>'
+        : sharedDiary.slice(0, 5).map(d => `
+            <div style="padding:8px 12px;background:var(--primary-tint);border-radius:8px;margin-bottom:6px;font-size:0.85rem;">
+              <div>${d.text}</div>
+              <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:3px;">${d.date}</div>
+            </div>
+          `).join('')
+      }
+    </div>
+
+    <!-- Action link -->
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:4px;border-top:1px solid var(--border);">
+      <button class="btn btn-primary btn-sm" onclick="closeModal('detail-modal');openActionModal(${eid},'${emp.name}');">+ Send manager action</button>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('detail-modal');scrollSec('action-plans-section');selectApEmployeeById(${eid});">See action plan →</button>
+    </div>
+  `;
+}
+
+function selectApEmployeeById(eid) {
+  const idx = apEmployees.findIndex(e => e.id === eid);
+  if (idx !== -1) selectApEmployee(idx);
+}
+
 function openActionModal(eid, name) {
   actionTargetEid = eid;
   document.getElementById('action-emp-name').textContent = name;
@@ -796,7 +925,10 @@ async function sendManagerAction() {
 
 async function dismissNudge(id, btn) {
   await fetch(`/api/nudges/${id}/dismiss`, { method: 'PUT' });
-  btn.closest('.nudge-card').remove();
+  const row = document.getElementById(`nudge-row-${id}`);
+  if (row) row.remove();
+  if (!document.getElementById('nudges-list').children.length)
+    document.getElementById('nudges-panel').style.display = 'none';
 }
 
 function closeModal(id) {
