@@ -120,7 +120,7 @@
       <div class="card" id="resources-section" style="min-width:0;">
         <h2>Resources for you</h2>
         <p style="font-size:0.8rem;margin-bottom:14px;">Curated for women returning after a career break.</p>
-        <div id="resource-list" style="display:flex;flex-direction:row;gap:10px;overflow-x:auto;padding-bottom:6px;">
+        <div id="resource-list" style="display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto;">
           <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
         </div>
       </div>
@@ -384,7 +384,7 @@ async function init() {
     resList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No resources added yet.</p>';
   } else {
     resList.innerHTML = empResources.slice(0, 5).map(r => `
-      <div class="resource-card" id="res-${r.id}" style="flex-shrink:0;width:180px;">
+      <div class="resource-card" id="res-${r.id}">
         <div class="rc-meta">
           <span class="badge badge-purple">${r.category}</span>
         </div>
