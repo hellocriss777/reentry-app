@@ -106,7 +106,7 @@
     <div class="dash-row dash-row-2" style="margin-bottom:20px;align-items:start;" id="wins-section">
       <div class="card">
         <h2>My journal</h2>
-        <p style="font-size:0.8rem;margin-bottom:12px;">A private space to note how things are going. Use 👁 to share an entry with your manager.</p>
+        <p style="font-size:0.8rem;margin-bottom:12px;">A private space to note how things are going. Toggle "Share" on any entry to let your manager see it.</p>
         <div class="wins-input-row">
           <input type="text" id="win-input" placeholder="How are things going today…" maxlength="280"/>
           <button class="btn btn-primary btn-sm" onclick="addWin()">Add</button>
@@ -120,7 +120,7 @@
       <div class="card" id="resources-section">
         <h2>Resources for you</h2>
         <p style="font-size:0.8rem;margin-bottom:14px;">Curated for women returning after a career break.</p>
-        <div id="resource-list" style="display:flex;flex-direction:column;gap:10px;">
+        <div id="resource-list" style="display:flex;flex-direction:row;gap:10px;overflow-x:auto;padding-bottom:6px;">
           <p style="color:var(--text-secondary);font-size:0.875rem;">Loading…</p>
         </div>
       </div>
@@ -383,21 +383,17 @@ async function init() {
   if (empResources.length === 0) {
     resList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.875rem;">No resources added yet.</p>';
   } else {
-    resList.innerHTML = empResources.slice(0, 5).map(r => {
-      const isRead = readIds.includes(r.id);
-      return `
-        <div class="resource-card" id="res-${r.id}" style="position:relative;">
-          <div class="rc-meta" style="display:flex;align-items:center;gap:6px;">
-            <span class="badge badge-purple">${r.category}</span>
-            ${!isRead ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--primary);flex-shrink:0;" title="New"></span>` : ''}
-          </div>
-          <h4 style="color:${isRead ? 'var(--text-secondary)' : 'inherit'}">${r.title}</h4>
-          ${r.url && r.url !== '#'
-            ? `<a href="${r.url}" target="_blank" style="font-size:0.8rem;" onclick="markResourceRead(${r.id});document.getElementById('res-${r.id}').querySelector('span[title]')?.remove();document.getElementById('res-${r.id}').querySelector('h4').style.color='';">Open resource →</a>`
-            : ''}
+    resList.innerHTML = empResources.slice(0, 5).map(r => `
+      <div class="resource-card" id="res-${r.id}" style="flex-shrink:0;width:180px;">
+        <div class="rc-meta">
+          <span class="badge badge-purple">${r.category}</span>
         </div>
-      `;
-    }).join('');
+        <h4 style="margin:6px 0 8px;font-size:0.875rem;line-height:1.35;">${r.title}</h4>
+        ${r.url && r.url !== '#'
+          ? `<a href="${r.url}" target="_blank" style="font-size:0.8rem;" onclick="markResourceRead(${r.id})">Open resource →</a>`
+          : ''}
+      </div>
+    `).join('');
   }
 
   // Manager nudges (messages)
@@ -468,6 +464,8 @@ function renderChanges(changes, showAll) {
   `).join('');
   if (!showAll && changes.length > 4) {
     el.innerHTML += `<a href="#" class="panel-link" style="margin-top:8px;display:inline-block;" onclick="renderChanges(allChanges,true);return false;">View all ${changes.length} updates →</a>`;
+  } else if (showAll && changes.length > 4) {
+    el.innerHTML += `<a href="#" class="panel-link" style="margin-top:8px;display:inline-block;" onclick="renderChanges(allChanges,false);return false;">Show less ↑</a>`;
   }
 }
 
@@ -530,6 +528,11 @@ function renderJournal(diary, showAll) {
   if (!showAll && diary.length > 3) {
     moreEl.style.display = 'block';
     moreLink.textContent = `View all ${diary.length} entries →`;
+    moreLink.onclick = function(e) { e.preventDefault(); renderJournal(allDiary, true); };
+  } else if (showAll && diary.length > 3) {
+    moreEl.style.display = 'block';
+    moreLink.textContent = 'Show less ↑';
+    moreLink.onclick = function(e) { e.preventDefault(); renderJournal(allDiary, false); };
   } else {
     moreEl.style.display = 'none';
   }
@@ -544,10 +547,9 @@ function winEntryHtml(d) {
         <div class="win-date">${d.date}</div>
       </div>
       <button
-        title="${shared ? 'Shared with manager — click to make private' : 'Private — click to share with manager'}"
         onclick="toggleShare(${d.id}, this)"
-        style="flex-shrink:0;background:none;border:none;cursor:pointer;font-size:1rem;opacity:${shared ? '1' : '0.35'};padding:2px 4px;line-height:1;"
-      >👁</button>
+        style="flex-shrink:0;background:${shared ? 'var(--primary-tint)' : 'transparent'};border:1px solid ${shared ? 'var(--primary)' : 'var(--border)'};border-radius:99px;cursor:pointer;font-size:0.7rem;font-weight:600;color:${shared ? 'var(--primary)' : 'var(--text-secondary)'};padding:2px 8px;line-height:1.6;white-space:nowrap;"
+      >${shared ? 'Shared' : 'Share'}</button>
     </div>
   `;
 }
@@ -560,8 +562,10 @@ async function toggleShare(id, btn) {
   const res = await fetch(`/api/diary/${id}/toggle-share`, { method: 'PUT' });
   const data = await res.json();
   const shared = data.shared === 1;
-  btn.style.opacity = shared ? '1' : '0.35';
-  btn.title = shared ? 'Shared with manager — click to make private' : 'Private — click to share with manager';
+  btn.textContent = shared ? 'Shared' : 'Share';
+  btn.style.background = shared ? 'var(--primary-tint)' : 'transparent';
+  btn.style.border = `1px solid ${shared ? 'var(--primary)' : 'var(--border)'}`;
+  btn.style.color = shared ? 'var(--primary)' : 'var(--text-secondary)';
 }
 
 async function addWin() {

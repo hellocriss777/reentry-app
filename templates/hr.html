@@ -46,7 +46,7 @@
       <a href="#pairings-section" onclick="setActive(this);scrollSec('pairings-section');return false;">Pairings</a>
       <a href="#resources-section" onclick="setActive(this);scrollSec('resources-section');return false;">Resources</a>
       <a href="#changes-section" onclick="setActive(this);scrollSec('changes-section');return false;">Announcements</a>
-      <a href="#bias-settings-section" onclick="setActive(this);scrollSec('bias-settings-section');return false;">Bias alerts</a>
+      <a href="#" onclick="openAlertSettings();return false;">Alert settings ⚙</a>
     </div>
     <div class="sidebar-footer">
       HR Admin &nbsp;·&nbsp; <a href="/" style="color:rgba(255,255,255,0.5)">Switch role</a>
@@ -248,56 +248,41 @@
       </div>
     </div>
 
-    <!-- Bias alert settings -->
-    <div class="card" id="bias-settings-section" style="margin-bottom:20px;">
-      <h2 style="margin-bottom:4px;">Bias alert settings</h2>
-      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:20px;">Configure when Hearth flags potential re-entry bias patterns to HR. Thresholds are informed by research on manager behaviour during return-to-work transitions.</p>
-      <div class="dash-row dash-row-2">
-
-        <div>
-          <div class="form-group">
-            <label style="display:flex;justify-content:space-between;align-items:baseline;">
-              <span>Manager check-in gap</span>
-              <strong id="val-checkin" style="color:var(--primary);font-size:0.875rem;">10 days</strong>
-            </label>
-            <input type="range" id="thr-checkin" min="3" max="30" value="10" style="width:100%;accent-color:var(--primary);margin:6px 0;" oninput="updateThr('checkin',this.value)">
-            <div style="font-size:0.75rem;color:var(--text-secondary);">Alert if no nudge or message sent within this window</div>
-          </div>
-          <div class="form-group">
-            <label style="display:flex;justify-content:space-between;align-items:baseline;">
-              <span>Meeting inclusion window</span>
-              <strong id="val-meeting" style="color:var(--primary);font-size:0.875rem;">14 days</strong>
-            </label>
-            <input type="range" id="thr-meeting" min="3" max="28" value="14" style="width:100%;accent-color:var(--primary);margin:6px 0;" oninput="updateThr('meeting',this.value)">
-            <div style="font-size:0.75rem;color:var(--text-secondary);">Alert if employee not included in scheduled team meetings</div>
-          </div>
-          <div class="form-group">
-            <label style="display:flex;justify-content:space-between;align-items:baseline;">
-              <span>Milestone stagnation</span>
-              <strong id="val-milestone" style="color:var(--primary);font-size:0.875rem;">7 days</strong>
-            </label>
-            <input type="range" id="thr-milestone" min="3" max="21" value="7" style="width:100%;accent-color:var(--primary);margin:6px 0;" oninput="updateThr('milestone',this.value)">
-            <div style="font-size:0.75rem;color:var(--text-secondary);">Alert if no milestones marked complete within this period</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
-            <button class="btn btn-primary" onclick="saveAlertSettings()">Save settings</button>
-            <span id="bias-saved-msg" style="display:none;font-size:0.82rem;color:var(--success);">Settings saved ✓</span>
-          </div>
-        </div>
-
-        <div style="background:var(--primary-tint);border-radius:var(--radius);padding:18px;font-size:0.82rem;color:var(--text-secondary);line-height:1.65;">
-          <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--primary);margin-bottom:12px;">Evidence base</div>
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            <div><strong style="color:var(--text);">Check-in frequency</strong> — managers often underestimate the value of regular contact in the first 90 days. Infrequent check-ins correlate with lower re-entry confidence and higher attrition risk.</div>
-            <div><strong style="color:var(--text);">Meeting inclusion</strong> — exclusion from planning meetings is one of the most commonly reported re-entry barriers, often driven by unconscious assumptions about availability and engagement.</div>
-            <div><strong style="color:var(--text);">Milestone visibility</strong> — completing visible milestones supports identity reactivation and confidence recovery, particularly in weeks 3–6 of return.</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
   </main>
+</div>
+
+<!-- Alert settings modal -->
+<div class="modal-overlay" id="alert-settings-modal">
+  <div class="modal" style="position:relative;width:min(400px,92vw);">
+    <button class="modal-close" onclick="closeModal('alert-settings-modal')">×</button>
+    <h2 style="margin-bottom:20px;">Alert thresholds</h2>
+    <div class="form-group">
+      <label style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span>Check-in gap</span>
+        <strong id="val-checkin" style="color:var(--primary);font-size:0.875rem;">10 days</strong>
+      </label>
+      <input type="range" id="thr-checkin" min="3" max="30" value="10" style="width:100%;accent-color:var(--primary);margin:6px 0;" oninput="updateThr('checkin',this.value)">
+    </div>
+    <div class="form-group">
+      <label style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span>Meeting inclusion window</span>
+        <strong id="val-meeting" style="color:var(--primary);font-size:0.875rem;">14 days</strong>
+      </label>
+      <input type="range" id="thr-meeting" min="3" max="28" value="14" style="width:100%;accent-color:var(--primary);margin:6px 0;" oninput="updateThr('meeting',this.value)">
+    </div>
+    <div class="form-group">
+      <label style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span>Milestone stagnation</span>
+        <strong id="val-milestone" style="color:var(--primary);font-size:0.875rem;">7 days</strong>
+      </label>
+      <input type="range" id="thr-milestone" min="3" max="21" value="7" style="width:100%;accent-color:var(--primary);margin:6px 0;" oninput="updateThr('milestone',this.value)">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('alert-settings-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAlertSettings()">Save</button>
+    </div>
+    <span id="bias-saved-msg" style="display:none;font-size:0.82rem;color:var(--success);margin-top:8px;text-align:center;">Saved ✓</span>
+  </div>
 </div>
 
 <!-- Enrol employee modal -->
@@ -424,6 +409,10 @@ function closeSidebar() {
 }
 
 /* ── Bias alert settings ────────────────────────────────────────── */
+function openAlertSettings() {
+  document.getElementById('alert-settings-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
 function updateThr(type, value) {
   document.getElementById(`val-${type}`).textContent = `${value} days`;
 }
@@ -434,8 +423,8 @@ function saveAlertSettings() {
     milestone: document.getElementById('thr-milestone').value,
   }));
   const msg = document.getElementById('bias-saved-msg');
-  msg.style.display = 'inline';
-  setTimeout(() => { msg.style.display = 'none'; }, 3000);
+  msg.style.display = 'block';
+  setTimeout(() => { msg.style.display = 'none'; closeModal('alert-settings-modal'); }, 1200);
 }
 (function loadAlertSettings() {
   try {
