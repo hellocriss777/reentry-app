@@ -9,7 +9,8 @@
   <link rel="stylesheet" href="/static/style.css"/>
   <style>
     /* ── Sidebar scroll fix (many nav items) ─────────────────────── */
-    .sidebar-nav { overflow-y: auto; }
+    .sidebar-nav { overflow-y: auto; scrollbar-width: none; }
+    .sidebar-nav::-webkit-scrollbar { display: none; }
     .sidebar-nav a { padding: 8px 20px; }
 
     /* ── Employee switcher ────────────────────────────────────────── */
