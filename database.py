@@ -343,12 +343,12 @@ def _seed(conn):
 
     # ─────────────────────────────────────────────────────────────────────────
     # Employee 3: Jess Thompson — UX Researcher
-    # Return date: 2026-02-23 → on demo day she is on Day 85
+    # Return date: 2026-03-01 → on demo day she is on Day 85
     # Story arc: late-phase, thriving, near window close
     # ─────────────────────────────────────────────────────────────────────────
     e3 = conn.execute(
         'INSERT INTO employees (name,role,start_date,manager_name,buddy_name,buddy_email,manager_email) VALUES (?,?,?,?,?,?,?)',
-        ('Jess Thompson', 'UX Researcher', '2026-02-23',
+        ('Jess Thompson', 'UX Researcher', '2026-03-01',
          'Tom Walters', 'Priya Sharma', 'priya.sharma@company.com', 'tom.walters@company.com')
     ).lastrowid
 
@@ -376,56 +376,56 @@ def _seed(conn):
     conn.executemany(
         'INSERT INTO checkins (employee_id,date,belonging,confidence,inclusion,support,visibility,note) VALUES (?,?,?,?,?,?,?,?)',
         [
-            (e3, '2026-02-27', 3, 2, 3, 3, 2, 'Nervous but genuinely glad to be back. The team made me feel welcome.'),
-            (e3, '2026-03-06', 3, 3, 3, 3, 3, 'Things are starting to click. Priya (buddy) has been incredible.'),
-            (e3, '2026-03-13', 4, 3, 3, 4, 3, 'Led my first research session back — it came back like muscle memory.'),
-            (e3, '2026-03-20', 4, 4, 4, 4, 3, '30-day review with Tom was encouraging. I\'m ahead of where I expected to be.'),
-            (e3, '2026-03-27', 4, 4, 4, 4, 4, 'Presented research findings to the whole team. Got a standing ovation (almost).'),
-            (e3, '2026-04-17', 5, 4, 5, 4, 4, '60-day review: Tom said I\'ve set a new standard for how re-entry can look.'),
-            (e3, '2026-05-08', 5, 5, 5, 5, 5, 'Fully integrated. Leading the Q2 research stream. Couldn\'t be happier to be back.'),
+            (e3, '2026-03-05', 3, 2, 3, 3, 2, 'Nervous but genuinely glad to be back. The team made me feel welcome.'),
+            (e3, '2026-03-12', 3, 3, 3, 3, 3, 'Things are starting to click. Priya (buddy) has been incredible.'),
+            (e3, '2026-03-19', 4, 3, 3, 4, 3, 'Led my first research session back — it came back like muscle memory.'),
+            (e3, '2026-03-26', 4, 4, 4, 4, 3, '30-day review with Tom was encouraging. I\'m ahead of where I expected to be.'),
+            (e3, '2026-04-02', 4, 4, 4, 4, 4, 'Presented research findings to the whole team. Got a standing ovation (almost).'),
+            (e3, '2026-04-23', 5, 4, 5, 4, 4, '60-day review: Tom said I\'ve set a new standard for how re-entry can look.'),
+            (e3, '2026-05-14', 5, 5, 5, 5, 5, 'Fully integrated. Leading the Q2 research stream. Couldn\'t be happier to be back.'),
         ]
     )
 
     conn.executemany(
         'INSERT INTO diary_entries (employee_id,date,text,mood) VALUES (?,?,?,?)',
         [
-            (e3, '2026-02-27', 'Week one done. I was terrified and it was fine. Better than fine.', 'relieved'),
-            (e3, '2026-03-13', 'Led the research session today. My hands were shaking at the start and steady by the end.', 'proud'),
-            (e3, '2026-03-27', 'Presented to the full team. I thought I had forgotten how to do this. I hadn\'t.', 'proud'),
-            (e3, '2026-04-17', '60-day review. Tom said I\'ve set the bar. I cried on the way home. Good crying.', 'warm'),
-            (e3, '2026-05-08', 'Leading the Q2 research stream. Five months ago I wasn\'t sure I still had it. I did.', 'proud'),
+            (e3, '2026-03-05', 'Week one done. I was terrified and it was fine. Better than fine.', 'relieved'),
+            (e3, '2026-03-19', 'Led the research session today. My hands were shaking at the start and steady by the end.', 'proud'),
+            (e3, '2026-04-02', 'Presented to the full team. I thought I had forgotten how to do this. I hadn\'t.', 'proud'),
+            (e3, '2026-04-23', '60-day review. Tom said I\'ve set the bar. I cried on the way home. Good crying.', 'warm'),
+            (e3, '2026-05-14', 'Leading the Q2 research stream. Five months ago I wasn\'t sure I still had it. I did.', 'proud'),
         ]
     )
 
     conn.executemany(
         'INSERT INTO manager_feedback (employee_id,date,text) VALUES (?,?,?)',
         [
-            (e3, '2026-03-20', "Jess — your 30-day review was outstanding. You've set the bar for how a return-to-work journey should look."),
-            (e3, '2026-03-27', "The presentation today was exceptional. The whole team noticed. Really proud of what you've done."),
-            (e3, '2026-04-17', "60-day review: you are fully integrated and exceeding expectations. I'm recommending you for the Q2 research lead."),
-            (e3, '2026-05-08', "Leading the Q2 stream is exactly the right next step. You've earned it."),
+            (e3, '2026-03-26', "Jess — your 30-day review was outstanding. You've set the bar for how a return-to-work journey should look."),
+            (e3, '2026-04-02', "The presentation today was exceptional. The whole team noticed. Really proud of what you've done."),
+            (e3, '2026-04-23', "60-day review: you are fully integrated and exceeding expectations. I'm recommending you for the Q2 research lead."),
+            (e3, '2026-05-14', "Leading the Q2 stream is exactly the right next step. You've earned it."),
         ]
     )
 
     conn.executemany(
         'INSERT INTO manager_notes (employee_id,date,text) VALUES (?,?,?)',
         [
-            (e3, '2026-02-24', 'Strong first day. Priya messaged immediately — great buddy pairing.'),
-            (e3, '2026-03-20', '30-day review: 4.0 avg check-in score. On track to exceed all milestones.'),
-            (e3, '2026-04-17', '60-day review: 4.8 avg. Formally nominating for Q2 research lead — should be an easy yes.'),
+            (e3, '2026-03-02', 'Strong first day. Priya messaged immediately — great buddy pairing.'),
+            (e3, '2026-03-26', '30-day review: 4.0 avg check-in score. On track to exceed all milestones.'),
+            (e3, '2026-04-23', '60-day review: 4.8 avg. Formally nominating for Q2 research lead — should be an easy yes.'),
         ]
     )
 
     conn.executemany(
         'INSERT INTO manager_actions (employee_id,date,text,done) VALUES (?,?,?,?)',
         [
-            (e3, '2026-02-24', 'Have a welcome back conversation within the first two days', 1),
-            (e3, '2026-03-01', 'Include Jess in at least one team decision this week', 1),
-            (e3, '2026-03-13', 'Acknowledge one specific contribution Jess made this month', 1),
-            (e3, '2026-03-20', '30-day milestone review', 1),
-            (e3, '2026-04-17', '60-day formal review and career conversation', 1),
-            (e3, '2026-05-17', 'Send a closing nudge — 85-day window check-in', 0),
-            (e3, '2026-05-24', 'Formal close of 90-day re-entry window — celebrate the journey', 0),
+            (e3, '2026-03-02', 'Have a welcome back conversation within the first two days', 1),
+            (e3, '2026-03-07', 'Include Jess in at least one team decision this week', 1),
+            (e3, '2026-03-19', 'Acknowledge one specific contribution Jess made this month', 1),
+            (e3, '2026-03-26', '30-day milestone review', 1),
+            (e3, '2026-04-23', '60-day formal review and career conversation', 1),
+            (e3, '2026-05-23', 'Send a closing nudge — 85-day window check-in', 0),
+            (e3, '2026-05-30', 'Formal close of 90-day re-entry window — celebrate the journey', 0),
         ]
     )
 
